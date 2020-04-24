@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="IdeasLocas">
+
+    <title>ATTPwn</title>
+
+    <!-- Google font -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i&display=swap" rel="stylesheet">
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/magnific-popup.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/owl.carousel.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animate.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/slicknav.min.css') }}" />
+
+    <!-- Main Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/all.css') }}" />
+
+
+
+
+</head>
+
+
+
+
+<body id="page-top">
+
+    <!-- Masthead -->
+
+    <header class="header-section">
+
+        <a class="navbar-brand js-scroll-trigger" href="#page-top">ATTPwn</a>
+        <ul class="main-menu">
+            <li class="nav-item mx-0 mx-lg-1">
+                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/#inicio">Home</a>
+            </li>
+            <li class="nav-item mx-0 mx-lg-1">
+                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/plan">Plan</a>
+            </li>
+            <li class="nav-item mx-0 mx-lg-1">
+                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/results">Results</a>
+            </li>
+            <li class="nav-item mx-0 mx-lg-1">
+                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/warriors">Warriors</a>
+            </li>
+            <li class="nav-item mx-0 mx-lg-1">
+                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/attck">ATT&CK</a>
+            </li>
+            <li class="nav-item mx-0 mx-lg-1">
+                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/ImportData">Upload</a>
+            </li>
+            <!-- 
+            <li class="nav-item mx-0 mx-lg-1">
+                <button class="btn btn-danger" type="button" onclick="reset(this)" id="reset">hard reset</button>
+            </li> -->
+        </ul>
+    </header>
+
+    <!-- Masthead -->
+    <!-- Page top section -->
+    <section class="page-top-section ">
+        <div class="container">
+            <h3>Adversary Emulation</h3>
+            <br>
+            <h2>ATTPwn</h2>
+        </div>
+    </section>
+    <!-- Page top section -->
+
+    <!-- Game section -->
+    <section class="game-section">
+        <div class="owl-stage">
+            <div class="row ">
+                <div class="col-9">
+
+                </div>
+                <div class="col 3 text-center">
+                    <button class="btn btn-primary" type="button" onclick=goimplementation(this) id="implementation" data-toggle="tooltip" data-placement="top" title="Go to implementation view">Implementations</button>
+                    <button class="btn btn-danger" onclick="reset(this)" id="reset" data-toggle="tooltip" data-placement="top" title="Restore default database">Hard reset</button>
+                </div>
+            </div>
+            <div class="row m-md-3 ">
+                <div class="col 5">
+
+                </div>
+                <div class="col-3 ">
+                    <ul class="nav nav-tabs " id="myTab" role="tablist">
+                        <li class="nav-item tex">
+                            <a class="nav-link active" id="Threats" data-toggle="tab" onclick="swappage(this)" href="" role="tab" aria-selected="true">Threats</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="Tactics" data-toggle="tab" onclick="swappage(this)" href="" role="tab" aria-selected="false">Tactics</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="Techniques" data-toggle="tab" onclick="swappage(this)" href="" role="tab" aria-selected="false">Techniques</a>
+                        </li>
+                        <!-- <li class="nav-item">
+                            <a class="nav-link" id="functions" data-toggle="tab" onclick="implementations(this)" href="" role="tab" aria-selected="false">Implementations</a>
+                        </li> -->
+                    </ul>
+
+                </div>
+
+                <div class="col 4">
+
+                </div>
+            </div>
+
+            <!-- <h1 class="text-primary  text-center "> Threats</h1> -->
+            <br>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="col-sm-12" id="tableDiv">
+                        <table class="table table-dark text-center table-bordered" id="tableData">
+                            <thead class="thead-light ">
+                                <tr>
+                                    <th class="column1">ID </th>
+                                    <th class="column2">Name</th>
+                                    <th class="column3">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for Threats in threatslist %}
+                                <tr>
+                                    <!-- <td class="column1">{{ Threats.IDThreat }}</td> -->
+                                    <td class="column1">{{ Threats.ID }}</td>
+                                    <td class="column2">{{ Threats.Name}}</td>
+                                    <td class="column3"> {{ Threats.Information }}</td>
+                                </tr>
+                                {% endfor %}
+
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer section -->
+    <section class="banner-section ">
+        <div class="footer-section ">
+            <div class="social-links-warp ">
+                <div class="container">
+                    <div class="social-links">
+                        <a href="https://twitter.com/ElevenPaths" target="_blank"><i class="fab fa-twitter"></i><span>twitter</span></a>
+                    </div>
+                </div>
+
+                <div class="copyright bg-transparent">
+                    <p>
+                        Created with <i class="fa fa-heart" aria-hidden="true"></i> by: 'Ideas Locas' (CDCO Telefonica)
+                    </p>
+                    <p>
+                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                        Copyright &copy;
+                        <script>
+                            document.write(new Date().getFullYear());
+                        </script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                    </p>
+                </div>
+            </div>
+    </section>
+    <!-- Footer section end -->
+
+
+    <script>
+        function swappage(sender) {
+
+            let pulsador = sender.id;
+
+            let datos = JSON.stringify({
+                "Datos": pulsador
+            });
+
+
+            fetch('/givemetable', {
+                method: 'POST',
+                body: datos
+            }).then(function(response) {
+                response.json().then(function(data) {
+                    var table = document.getElementById("tableData");
+                    table.style.visibility = 'visible';
+                    for (var i = table.rows.length - 1; i > 0; i--) {
+                        table.deleteRow(i);
+                    }
+                    for (i in data) {
+                        const posicion = data.length - i;
+                        var row = table.insertRow(table.rows.length);
+                        var cell1 = row.insertCell(0);
+                        var cell2 = row.insertCell(1);
+                        var cell3 = row.insertCell(2);
+                        cell1.innerHTML = data[i]['ID'];
+                        cell2.innerHTML = data[i]['Name'];
+                        cell3.innerHTML = data[i]['Information'];
+                    }
+
+                })
+            })
+        }
+
+        function implementations(sender) {
+
+            let pulsador = sender.id;
+
+            let datos = JSON.stringify({
+                "Datos": pulsador
+            });
+            var table = document.getElementById("tableData");
+            for (var i = table.rows.length - 1; i > 0; i--) {
+                table.deleteRow(i);
+            }
+            var tableDiv = document.getElementById("tableDiv");
+            table.style.visibility = 'hidden';
+            if (document.getElementById("Div1")) {
+
+                var Div1 = document.getElementById("Div1");
+                Div1.innerHTML = "";
+            }
+
+            var Div = document.createElement("Div"); // Create a <button> element
+            Div.setAttribute("id", "Div1");
+            var text_area = document.createElement("textarea"); // Create a <button> element
+            text_area.innerHTML = "prueba"; // Insert text
+            document.getElementById("tableDiv").appendChild(Div)
+            document.getElementById("Div1").appendChild(text_area)
+
+        }
+
+        function reset(sender) {
+            let pulsador = sender.id;
+
+            let datos = JSON.stringify({
+                "Datos": pulsador
+            });
+            console.log(pulsador)
+            var message;
+            var opcion = confirm("This process will reset the database to default state.");
+            if (opcion == true) {
+                console.log("accept")
+                $.ajax({
+                    type: 'POST',
+                    url: '/reset',
+                    contentType: 'application/json;charset=UTF-8',
+                    data: datos,
+                    dataType: 'json',
+                    success: window.location.href = '/',
+                })
+
+            } else {
+                message = "cancel";
+                console.log(message)
+            }
+        }
+
+
+
+
+        function goimplementation(sender) {
+            window.location = "\implementation";
+
+        }
+    </script>
+    <!--====== Javascripts & Jquery ======-->
+    <!-- popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+    <!-- popper -->
+    <script src="{{ url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.slicknav.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/circle-progress.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.magnific-popup.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+
+</html>
