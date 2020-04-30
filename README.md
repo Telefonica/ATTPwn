@@ -34,11 +34,7 @@ Now, open your browser: http://localhost:5000
 
 You can use:
 
-<<<<<<< HEAD
 ```[python]
-=======
-````[python]
->>>>>>> 4941deda595857bcd2208a35a610356b3cd26fff
 docker build -t "ATTPwn" .
 ```
 
