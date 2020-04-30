@@ -30,6 +30,20 @@ python app.py
 ```
 Now, open your browser: http://localhost:5000
 
+# Docker
+
+You can use:
+
+````[python]
+docker build -t "ATTPwn" .
+```
+
+You can create a container:
+
+```[python]
+docker run --rm -d -p 5000:5000 IMAGE_ID
+```
+
 # Example videos
 
 ### *ATTPwn - All-in-One: Discovery + privilege escalation + credential dumping + lateral movement on W10*
