@@ -1,0 +1,62 @@
+#Title: invoke-AV_Services
+#Technique: T1063
+#Tactic: TA0007
+
+function invoke-AV_Services
+    {
+    <#
+    .SYNOPSIS
+    List Anti-virus services 
+    
+    .DESCRIPTION
+    Attack Commands: Run with command_prompt! Elevation is not Required 
+
+    .LINK
+
+    https://jdhitsolutions.com/blog/powershell/5187/get-antivirus-product-status-with-powershell/
+    #>
+    $good = $false
+    $results = $null
+    $Names = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntivirusProduct | Select displayName 
+    if (!($Names -eq $null) )
+        {
+        $results = ConvertFrom-WinDictionary($Names)               
+        $good = $true      
+        }
+    else
+        {
+        $results ="Does not antivirus services detected"  
+        }
+    return @{results=$results;success=$good}
+    }
+
+    function ConvertFrom-WinDictionary ($dictionary)
+    {
+
+    foreach ($item in $dictionary.displayName)
+      {
+      $value += ("-"+$item +"`n") | Out-String
+      }
+
+    return $value
+
+    }
+
+    
+#Main program
+$execute = {
+  
+}
+
+#GiveMeData if needed
+
+#get-credentials
+$execute = invoke-AV_Services
+
+#PutData if needed
+  # if($execute.success)
+  # {
+    
+  # }
+
+return @{results=$execute.results;success=$execute.success}

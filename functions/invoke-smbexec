@@ -1,3 +1,7 @@
+#Title: invoke-smbexec
+#Technique: T1075
+#Tactic: TA0008
+
 function Invoke-SMBExec
 {
 <#

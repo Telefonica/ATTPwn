@@ -1,0 +1,24 @@
+.os {
+  width: 30%;
+  margin-bottom: 7px;
+}
+
+.neo {
+  border-radius: 10px;
+  background: #0d1319 !important;
+  box-shadow: 10px 12px 10px #0b1015;
+  font-family: "Roboto";
+  text-align: center;
+  transition: 1s;
+
+  transform: translateY(100px, 0px);
+}
+
+.neo:hover {
+  transform: scale(1.025);
+}
+
+.warrior {
+  font-weight: 600;
+  color: #10ddb4 !important;
+}

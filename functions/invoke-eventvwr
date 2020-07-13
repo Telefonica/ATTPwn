@@ -1,3 +1,7 @@
+#Title: invoke-eventvwr
+#Technique: T1088
+#Tactic: TA0004 / TA0005
+
 function invoke-eventvwr{
     param(
       [String] $ip

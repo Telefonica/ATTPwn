@@ -35,13 +35,13 @@ Now, open your browser: http://localhost:5000
 You can use:
 
 ```[python]
-docker build -t "ATTPwn" .
+docker build -t attpwn:latest .
 ```
 
 You can create a container:
 
 ```[python]
-docker run --rm -d -p 5000:5000 IMAGE_ID
+docker run --rm -d -p 5000:5000 attpwn:latest
 ```
 
 # Example videos

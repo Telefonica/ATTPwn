@@ -1,0 +1,34 @@
+.menu {
+  background: #0d1319;
+}
+
+.navbar-brand {
+  color: #10ddb4 !important;
+  font-family: "Roboto";
+}
+
+.navbar-brand span {
+  color: white !important;
+  font-family: "Roboto";
+}
+
+.nav-item {
+  margin-left: 10%;
+  font-family: "Roboto";
+  font-weight: 600;
+  transition: 2s;
+  border-bottom: 0px solid #0d1319;
+}
+
+.navbar-nav .nav-item:hover {
+  border-bottom: 3px solid #10ddb4;
+}
+
+.active .nav-link {
+  border-bottom: 3px solid #10ddb4;
+}
+
+body {
+  background-attachment: fixed;
+  background-image: linear-gradient(#0d1319, rgb(40, 221, 180));
+}

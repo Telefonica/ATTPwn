@@ -1,0 +1,17 @@
+footer {
+    position: relative;
+    bottom: -400px;
+    background-color: #0d1319;
+}
+
+.footer-img {
+    width: 1%;
+}
+
+.footer-text span {
+    font-weight: bold;
+}
+
+.footer-img {
+    width: 27px;
+}

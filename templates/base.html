@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="IdeasLocas">
+
+    <title>ATTPwn: {% block title %}{% endblock title %}
+    </title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
+    <!-- Google font -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i&display=swap" rel="stylesheet">
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/menu.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/logo.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/imagenes.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}" />
+</head>
+
+<body id="page-top">
+    <!-- Navbar -->
+    <header class="sticky-top">
+        {% block nav %} {% endblock nav %}
+    </header>
+    <!-- Banner & Content -->
+    <section>
+        <div class="container-fluid" id="particles-js">
+            <!-- BANNER: Title -->
+            <div class="row justify-content-center p-4 logo-wrapper">
+                <div class="col-12 mb-1 p-1 text-center">
+                    <h1 class="display-3 logo">ATT<span>Pwn</span> </h1>
+                </div>
+                <div class="col-12 text-center">
+                    <h2 class="display-5 logo-2"> <span>Adversary </span>Emulation</h2>
+                </div>
+            </div>
+            <!-- BANNER: Subtitle -->
+            {% block subtitle %} {% endblock subtitle %}
+
+            <!-- Content -->
+            <div class="anim">
+                {% block content %} {% endblock %}
+            </div>
+
+        </div>
+    </section>
+    <!--Footer-->
+    <footer class="sticky container-fluid py-5 pb-1">
+        <div class="w-100 row">
+            <div class="text-white-50 w-100   text-center ">
+                <p class="footer-text">
+                    Created with <img src="{{ url_for('static', filename='img/love.png') }}" class="img-fluid footer-img"></img> by: '<span>Ideas
+                    Locas</span>' (CDCO Telefonica)
+                </p>
+                <p class="my-1 py-2">
+                    <a href="https://twitter.com/ElevenPaths" target="_blank"><img src="{{ url_for('static', filename='img/twitter.png') }}" class="twitter" alt=""></a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!--====== Javascripts & Jquery ======-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/particles.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block scripts %} {% endblock %}
+</body>
+
+</html>

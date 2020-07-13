@@ -1,3 +1,7 @@
+#Title: invoke-powerdump
+#Technique: T1003
+#Tactic: TA0006
+
 # Pulled from darkoperator's Posh-SecMod: 
 #   https://github.com/darkoperator/Posh-SecMod/blob/master/PostExploitation/PostExploitation.psm1
 function Invoke-PowerDump
