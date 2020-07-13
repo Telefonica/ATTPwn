@@ -30,6 +30,7 @@ python app.py
 ```
 Now, open your browser: http://localhost:5000
 
+<<<<<<< HEAD
 # Docker
 
 You can use:
@@ -44,6 +45,8 @@ You can create a container:
 docker run --rm -d -p 5000:5000 attpwn:latest
 ```
 
+=======
+>>>>>>> 75725d34c63948657110105b74019c516a2a2dc3
 # Example videos
 
 ### *ATTPwn - All-in-One: Discovery + privilege escalation + credential dumping + lateral movement on W10*
