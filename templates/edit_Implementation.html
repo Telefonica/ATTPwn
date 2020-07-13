@@ -1,0 +1,156 @@
+{% extends 'base.html' %} {% block content %}
+
+<section class="game-section">
+  <div class="container">
+    <h2 class="text-center text-primary">Implementations</h2>
+    <br />
+
+    <br />
+    <div class="row">
+      <div class="col-md-6">
+        <h5 class="text-white text-center m-2 text-primary">Tactics</h5>
+        <br />
+        <div class="text-center">
+          <select class="custom-select" id="tactic" name="tactic">
+            {% for tactic in tacticList %}
+            <option value="{{tactic.IDMitre}}"
+              >{{tactic.IDMitre}} - {{tactic.Name}}</option
+            >
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <h5 class="text-white text-center m-2 text-primary">Techniques</h5>
+        <br />
+        <div class="text-center">
+          <select class="custom-select" id="intel" name="intel">
+            {% for tech in techniqueList %}
+            <option value="{{tech.Function}}"
+              >{{tech.IDMitre}} - {{tech.Name}} - {{tech.Function}}</option
+            >
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+    <!-- <div class="row mt-3 bg-warning">
+                <h5 class="center-block">Function</h5>
+            </div> -->
+    <h5 class="text-center mt-3">Function</h5>
+    <div class="row mt-3">
+      <div class="col-12 text-center">
+        <textarea
+          class="text-area-disabled"
+          rows="10"
+          cols="50"
+          placeholder="function..."
+          name="functionFile"
+          id="functionFile"
+          readonly
+        ></textarea>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--====== Javascripts & Jquery ======-->
+
+<script>
+  var tactic_select = document.getElementById("tactic");
+  var intel_select = document.getElementById("intel");
+  tactic_select.onclick = function () {
+    tactic = tactic_select.value;
+
+    fetch("/Directive/tactic/" + tactic).then(function (response) {
+      response.json().then(function (data) {
+        var optionHTML = "";
+        for (var intel of data.intels) {
+          optionHTML +=
+            '<option value="' +
+            intel.Function +
+            '">' +
+            intel.IDMitre +
+            " - " +
+            intel.Name +
+            " - " +
+            intel.Function +
+            "</option>";
+        }
+        intel_select.innerHTML = optionHTML;
+      });
+    });
+  };
+
+  var Drop_Intel = document.getElementById("intel");
+  Drop_Intel.onclick = function () {
+    if (this.value != "") {
+      var filename = this.value;
+      var flaskcodePath = "/flaskcode/resource-data/" + filename + ".txt";
+      console.log(filename);
+      console.log(flaskcodePath);
+      loadEditor({
+        url: flaskcodePath,
+        filePath: filename,
+      });
+    }
+  };
+
+  function loadEditor(resource, forceReload, isNewResource) {
+    var flaskcode = window.flaskcode || {};
+    if (
+      !forceReload &&
+      (flaskcode.editorWidget.resourceName == resource.url ||
+        (flaskcode.editorWidget.editorState ==
+          flaskcode.editorStates.MODIFIED &&
+          !confirm(
+            "Current changes not saved. Are you sure to move on without saving?"
+          )))
+    ) {
+      flaskcode.editorWidget.editor.focus();
+      return false;
+    }
+    if (isNewResource) {
+      flaskcode.setEditor("", resource, isNewResource);
+    } else {
+      $.ajax({
+        type: "GET",
+        url: resource.url,
+        dataType: "text",
+        cache: false,
+        beforeSend: function (xhr, settings) {
+          flaskcode.$editorLoader.show();
+        },
+        success: function (data, status, xhr) {
+          if (status == "success") {
+            resource.mimetype = xhr.getResponseHeader("X-File-Mimetype");
+            resource.extension = xhr.getResponseHeader("X-File-Extension");
+            resource.encoding = xhr.getResponseHeader("X-File-Encoding");
+            flaskcode.setEditor(data, resource);
+          } else {
+            flaskcode.clearEditor(
+              flaskcode.editorBodyMsg(
+                '<h1 class="text-center">Error while loading file !</h1>'
+              )
+            );
+          }
+        },
+        error: function (xhr, status, err) {
+          flaskcode.clearEditor(
+            flaskcode.editorBodyMsg(
+              '<h1 class="text-center">Error while loading file !</h1>' +
+                '<h2 class="text-center text-danger">' +
+                err +
+                "</h2>"
+            )
+          );
+        },
+        complete: function (xhr, status) {
+          flaskcode.$editorLoader.hide();
+        },
+      });
+    }
+  }
+</script>
+
+{% endblock %}

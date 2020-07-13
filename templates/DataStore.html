@@ -1,198 +1,161 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="IdeasLocas">
-
-    <title>ATTPwn</title>
-
-    <!-- Google font -->
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i&display=swap" rel="stylesheet">
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/magnific-popup.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/owl.carousel.min.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/animate.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/slicknav.min.css') }}" />
-
-    <!-- Main Stylesheets -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/all.css') }}" />
-
-
-
-
-</head>
-
-
-
-<body id="page-top">
-
-    <!-- Masthead -->
-
-    <header class="header-section">
-
-        <a class="navbar-brand js-scroll-trigger" href="#page-top">ATTPwn</a>
-        <ul class="main-menu">
-            <li class="nav-item mx-0 mx-lg-1">
-                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/#inicio">Home</a>
+{% extends 'base.html' %} {% block title %} DataStore {% endblock title %} {% block nav %}
+<nav class="navbar navbar-expand-lg navbar-dark menu">
+    <a class="navbar-brand" href="#"><span>ATT</span>Pwn</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="/#inicio">Home <span class="sr-only">(current)</span></a
+        >
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/plan">Plan</a>
             </li>
-            <li class="nav-item mx-0 mx-lg-1">
-                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/plan">Plan</a>
+            <li class="nav-item">
+                <a class="nav-link" href="/results">Results</a>
             </li>
-            <li class="nav-item mx-0 mx-lg-1">
-                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/results">Results</a>
+            <li class="nav-item">
+                <a class="nav-link" href="/warriors">Warriors</a>
             </li>
-            <li class="nav-item mx-0 mx-lg-1">
-                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/warriors">Warriors</a>
+            <li class="nav-item">
+                <a class="nav-link" href="/attck">ATT&CK</a>
             </li>
-            <li class="nav-item mx-0 mx-lg-1">
-                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/attck">ATT&CK</a>
+            <li class="nav-item">
+                <a class="nav-link" href="/ImportData">Upload</a>
             </li>
-            <li class="nav-item mx-0 mx-lg-1">
-                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/ImportData">Upload</a>
+            <li class="nav-item">
+                <a class="nav-link" href="/about">About</a>
             </li>
         </ul>
-    </header>
+    </div>
+</nav>
 
-    <!-- Masthead -->
-    <!-- Page top section -->
-    <section class="page-top-section ">
-        <div class="container">
-            <h3>Adversary Emulation</h3>
-            <br>
-            <h2>ATTPwn</h2>
+{% endblock nav %} {% block content %}
+
+<div class="row">
+    <div class="col">
+        <h2 class="text-center logo-2">DataStore</h2>
+    </div>
+</div>
+
+<div class="row flash justify-content-center">
+    <div class="col-md-12 text-center plan-card justify-content-center">
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %} {% if "success" in category %}
+
+        <div class="alert text-success" role="alert" id="alert_div">
+            {{ message }}
         </div>
-    </section>
-    <!-- Page top section -->
-    <!-- Game section -->
-    <section class="game-section">
-        <h4 class="text-center"> Loot from {{PlanName}}</h4>
-        <br>
-        <div class="owl-stage">
+        {% elif "danger" in category %}
 
-            <section class="blog-section ">
-                <div class="row m-md-1">
-
-                    <div class="col-sm-12 ">
-                        <table class="table table-dark text-center table-borderless " id="dataTable">
-                            <thead class="thead-light ">
-                                <tr>
-                                    <th class="column1">User</th>
-                                    <th class="column2">Password</th>
-                                    <th class="column3">NTLM</th>
-                                    <th class="column4">LM</th>
-                                    <th class="column5">IP</th>
-                                    <th class="column6"> </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for data in dataStoreArray %}
-                                <tr>
-                                    <!-- 
-                                    <td class="column1" contenteditable='true'>{{data.User}}</td>
-                                    <td class="column2" contenteditable='true'>{{data.Password}}</td>
-                                    <td class="column3" contenteditable='true'>{{data.NTLM}}</td>
-                                    <td class="column4" contenteditable='true'>{{data.LM}}</td>
-                                    <td class="column5" contenteditable='true'>{{data.IP}}</td>  
-                                    <td class="column5"><input name='DataID[]' style='border:0;outline:0;display:none' readonly='true' value='{{data.IDData}}'>
-                                        <button class="btn" onclick="UpdateRecord(this)" data-toggle="tooltip" data-placement="top" title="Update record">
-                                            <i class="fas fa-sync text-success"></i>
-                                        </button>
-                                    </td>
--->
-                                    <td class="column1">{{data.User}}</td>
-                                    <td class="column2">{{data.Password}}</td>
-                                    <td class="column3">{{data.NTLM}}</td>
-                                    <td class="column4">{{data.LM}}</td>
-                                    <td class="column5">{{data.IP}}</td>
-
-
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
+        <div class="alert text-danger" id="alert_div">
+            {{ message }}
         </div>
-    </section>
+        {% else %}
+        <div class="alert text-warning" id="alert_div">
+            {{ message }}
+        </div>
+        {% endif %} {% endfor %} {% endif %} {% endwith %}
+    </div>
+</div>
 
-    <!-- Footer section -->
-    <section class="banner-section ">
-        <div class="footer-section ">
-            <div class="social-links-warp ">
-                <div class="container">
-                    <div class="social-links">
-                        <a href="https://twitter.com/ElevenPaths" target="_blank"><i class="fab fa-twitter"></i><span>twitter</span></a>
-                    </div>
-                </div>
-
-                <div class="copyright bg-transparent">
-                    <p>
-                        Created with <i class="fa fa-heart" aria-hidden="true"></i> by: 'Ideas Locas' (CDCO Telefonica)
-                    </p>
-                    <p>
-                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                        Copyright &copy;
-                        <script>
-                            document.write(new Date().getFullYear());
-                        </script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                    </p>
-                </div>
+<section>
+    <div class="container">
+        <div class="row mt-5">
+            <div class="col-md">
+                <table class="table plan-card table-borderless" id="dataTable">
+                    <thead class="table-thead">
+                        <tr>
+                            <h4 class="text-center logo">Loot from {{Alias}}</h4>
+                        </tr>
+                        <tr class="text-center">
+                            <th class="">User</th>
+                            <th class="">Password</th>
+                            <th class="">NTLM</th>
+                            <th class="">LM</th>
+                            <th class="">IP</th>
+                            <th class="">Port</th>
+                            <th class=""></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for data in dataStoreArray %}
+                        <tr class="text-light text-center">
+                            <td class="" contenteditable="true">{{data.User}}</td>
+                            <td class="" contenteditable="true">{{data.Password}}</td>
+                            <td class="" contenteditable="true">{{data.NTLM}}</td>
+                            <td class="" contenteditable="true">{{data.LM}}</td>
+                            <td class="" contenteditable="true">{{data.IP}}</td>
+                            <td class="" contenteditable="true">{{data.Port}}</td>
+                            <td class="">
+                                <button class="btn" onclick="UpdateRecord(this)" id="{{data.IDData}}" data-toggle="tooltip" data-placement="top" title="Update record">
+                  <img
+                    src="{{ url_for('static', filename='img/save.png') }}"
+                    class="result-icon"
+                    alt="saveBtn"
+                  />
+                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-    </section>
-    <!-- Footer section end -->
+        </div>
 
-    <!--====== Javascripts & Jquery ======-->
+        <div class="row justify-content-end">
+            <div class="col-md-2">
+                <a class="btn btn-outline plan-card w-100" href="/results">
+          Back
+        </a>
+            </div>
+        </div>
+    </div>
+</section>
 
-    <script>
-        function UpdateRecord(sender) {
-            let cell = sender.parentElement
-            trrow = cell.parentElement
-            row = trrow.rowIndex
-                // console.log(trrow.rowIndex)
-            var myTab = document.getElementById('dataTable');
-            var dataID = document.getElementById('DataID');
-            console.log(dataID)
-            var objCells = myTab.rows.item(row).cells;
-            for (var j = 0; j < objCells.length; j++) {
-                // console.log(objCells.item(j));
-            }
-            // x.rowIndex
-            // LOOP THROUGH EACH ROW OF THE TABLE AFTER HEADER.
-            // for (i = 1; i < myTab.rows.length; i++) {
+<!--====== Javascripts & Jquery ======-->
 
-            //     // GET THE CELLS COLLECTION OF THE CURRENT ROW.
-            //     var objCells = myTab.rows.item(i).cells;
-
-            //     // LOOP THROUGH EACH CELL OF THE CURENT ROW TO READ CELL VALUES.
-            //     for (var j = 0; j < objCells.length; j++) {
-            //         console.log(objCells.item(j));
-            //     }
-            // }
-            // var table = document.getElementsByTagName("dataTable")[0];
-            // var x = document.getElementById("myTable").rows[0].cells.length;
-
-        }
-    </script>
-    <!-- popper -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
-    <!-- popper -->
-    <script src="{{ url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/jquery.slicknav.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/circle-progress.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/jquery.magnific-popup.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-
-</body>
-
-</html>
+<script>
+    function UpdateRecord(sender) {
+        var cell = sender.parentElement;
+        trrow = cell.parentElement;
+        row = trrow.rowIndex;
+        var myTab = document.getElementById("dataTable");
+        var dataID = document.getElementById("DataID[]");
+        var objCells = myTab.rows.item(row).cells;
+        var User = objCells[0].textContent;
+        var Password = objCells[1].textContent;
+        var NTLM = objCells[2].textContent;
+        var LM = objCells[3].textContent;
+        var IP = objCells[4].textContent;
+        var Port = objCells[5].textContent;
+        var datos = JSON.stringify({
+            IDData: sender.id,
+            User: User,
+            Password: Password,
+            NTLM: NTLM,
+            LM: LM,
+            IP: IP,
+            Port: Port,
+        });
+        $.ajax({
+            type: "POST",
+            url: "/updateDataStore",
+            contentType: "application/json;charset=UTF-8",
+            data: datos,
+            dataType: "json",
+            success: function(response) {
+                console.log(response);
+                location.reload();
+            },
+            error: function() {
+                alert("ajax error");
+            },
+        });
+    }
+    setTimeout(function() {
+        $("#alert_div").fadeOut("fast");
+    }, 5500); // <-- time in milliseconds
+</script>
+{% endblock %}

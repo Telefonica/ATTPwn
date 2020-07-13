@@ -1,0 +1,39 @@
+#Title: Name-function
+#Technique: ID Tech
+#Tactic: ID Tactic
+
+function invoke-namefunction
+    {
+    <#
+    .SYNOPSIS
+    
+    .DESCRIPTION
+    Attack Commands: Run with command_prompt! Elevation Required (e.g. root or admin)
+
+    .LINK
+
+    
+    #>
+    $good = $false
+    $results = $null
+    return @{results=$results;success=$good}
+    }
+
+
+#Main program
+$execute = {
+  
+}
+
+#GiveMeData if needed
+
+#get-credentials
+$execute = invoke-namefunction
+
+#PutData if needed
+  # if($execute.success)
+  # {
+    
+  # }
+
+return @{results=$execute.results;success=$execute.success}

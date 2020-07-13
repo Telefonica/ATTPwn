@@ -1,239 +1,179 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html' %} {% block title %} Task {% endblock title %} {% block
+nav %}
+<nav class="navbar navbar-expand-lg navbar-dark menu">
+  <a class="navbar-brand" href="#"><span>ATT</span>Pwn</a>
+  <button
+    class="navbar-toggler"
+    type="button"
+    data-toggle="collapse"
+    data-target="#navbarSupportedContent"
+    aria-controls="navbarSupportedContent"
+    aria-expanded="false"
+    aria-label="Toggle navigation"
+  >
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" href="/#inicio"
+          >Home <span class="sr-only">(current)</span></a
+        >
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/plan">Plan</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/results">Results</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/warriors">Warriors</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/attck">ATT&CK</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/ImportData">Upload</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/about">About</a>
+      </li>
+    </ul>
+  </div>
+</nav>
 
-<head>
+{% endblock nav %} {% block content %}
+<form action="/ins_directive" method="post">
+  <div class="row">
+    <div class="col-md">
+      <h2 class="text-center logo-2">{{ plan }} task list</h2>
+    </div>
+  </div>
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="IdeasLocas">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <table class="table plan-card text-center table-borderless">
+        <thead class="warrior-card-title">
+          <tr>
+            <th class="">Mitre Tactic ID</th>
+            <th class="">Tactic</th>
+            <th class="">Mitre Technique ID</th>
+            <th class="">Technique</th>
+            <th class="">Warrior Function</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="text-light border-top">
+            <h5 class="logo">{{ planDescription }}</h5>
+            {% for task in Tasklist %}
+            <!-- <td class="" name = "ListaTareas[]" >{{ task.IDTask }}</td> -->
+            <td class="text-light">
+              <input
+                name="IDTasks[]"
+                style="border: 0; outline: 0; display: none;"
+                readonly="true"
+                value="{{ task.IDTask }}"
+              />{{ task.IDMitreTactic }}
+            </td>
+            <td class="text-light">{{ task.NameTactic}}</td>
+            <td class="text-light">{{ task.IDMitreTech}}</td>
+            <td class="text-light">{{ task.NameTech}}</td>
+            <td class="text-light">{{ task.Function }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-    <title>ATTPwn</title>
-
-    <!-- Google font -->
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i&display=swap" rel="stylesheet">
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/magnific-popup.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/owl.carousel.min.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/animate.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/slicknav.min.css') }}" />
-
-    <!-- Main Stylesheets -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/all.css') }}" />
-
-
-
-
-</head>
-
-
-
-<body id="page-top">
-
-    <!-- Masthead -->
-
-    <header class="header-section">
-
-        <a class="navbar-brand js-scroll-trigger" href="#page-top">ATTPwn</a>
-        <ul class="main-menu">
-            <li class="nav-item mx-0 mx-lg-1">
-                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/#inicio">Home</a>
-            </li>
-            <li class="nav-item mx-0 mx-lg-1">
-                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/plan">Plan</a>
-            </li>
-            <li class="nav-item mx-0 mx-lg-1">
-                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/results">Results</a>
-            </li>
-            <li class="nav-item mx-0 mx-lg-1">
-                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/warriors">Warriors</a>
-            </li>
-            <li class="nav-item mx-0 mx-lg-1">
-                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/attck">ATT&CK</a>
-            </li>
-            <li class="nav-item mx-0 mx-lg-1">
-                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/ImportData">Upload</a>
-            </li>
-        </ul>
-    </header>
-
-    <!-- Masthead -->
-    <!-- Page top section -->
-    <section class="page-top-section ">
-        <div class="container">
-            <h3>Adversary Emulation</h3>
-            <br>
-            <h2>ATTPwn</h2>
+  <div class="row justify-content-end py-5">
+    <div class="col-md-3 plan-card py-1 pb-3">
+      <div class="row justify-content-center my-3">
+        <div class="col-md-5 h-100">
+          <h4 class="text-white text-center align-middle">Warrior ID:</h4>
         </div>
-    </section>
-    <!-- Page top section -->
-
-    <!-- Game section -->
-    <section class="game-section">
-        <div class="owl-stage">
-            <form action="/ins_directive" method="post">
-                <h2 class="text-white text-center ">"{{ plan }}" task list</h2>
-
-                <br>
-                <div class="row">
-                    <div class="col-9">
-                        <div class="text-left m-md-3 text-primary">
-                            <h7>{{ planDescription }}</h7>
-                        </div>
-                        <div class="col-sm-12">
-                            <table class="table table-dark text-center table-bordered">
-                                <thead class="thead-light ">
-                                    <tr>
-                                        <th class="column1">Mitre Tactic ID</th>
-                                        <th class="column2">Tactic</th>
-                                        <th class="column3">Mitre Technique ID</th>
-                                        <th class="column4">Technique</th>
-                                        <th class="column5">Warrior Function </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        {% for task in Tasklist %}
-                                        <!-- <td class="column1" name = "ListaTareas[]" >{{ task.IDTask }}</td> -->
-                                        <td class="column1"><input name='IDTasks[]' style='border:0;outline:0;display:none' readonly='true' value='{{ task.IDTask }}'>{{ task.IDMitreTactic }}</td>
-                                        <td class="column2">{{ task.NameTactic}}</td>
-                                        <td class="column3">{{ task.IDMitreTech}}</td>
-                                        <td class="column4">{{ task.NameTech}}</td>
-                                        <td class="column5"> {{ task.Function }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="col mr-3">
-                        <div class="row">
-                            <div class="col-6">
-                                <h4 class="text-white text-center"> Warrior ID: </h4>
-                            </div>
-                            <div class="col-6">
-                                <select class="custom-select" id="warrior" name="warrior">                                           
-                                {% for warrior in warriorList %}
-                                <option value="{{warrior.IDWarrior}}">{{warrior.Alias}}</option>
-                                {% endfor %}                                    
-                                </select>
-                            </div>
-                        </div>
-                        <br>
-                        <button type="submit" class="btn btn-outline-primary btn-lg btn-block">Allocate Plan</button>
-
-                        <button type="button" class="btn btn-outline-danger btn-lg btn-block" onclick="deletePlan()">Remove Plan</button>
-                    </div>
-                </div>
-            </form>
-            <div class="row">
-                <div class="col-9">
-                    <div class="col-sm-12">
-                        <form action="/exportar" method="post">
-                            <input type="text" id="IDPlan" readonly="true" hidden="true" value="{{idplan}}" name="IDPlan">
-                            <button type="submit" class="btn btn-outline-primary btn-lg btn-block" id="sendMessageButton">    
-                                Export Plan
-                         </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <br>
-            <div class="row">
-                <div class="col-9">
-                    <!-- <div class="col-sm-12">
-                        <button type="submit" class="btn btn-outline-primary btn-lg btn-block" id="Ver_directicas" onclick=redireccion()>    
-                              Ver directivas del warrior  
-                            </button>
-                        <script>
-                            function redireccion() {
-                                window.location.href = '/Warrior_Orders/' + warrior.options[warrior.selectedIndex].value;
-                            }
-                        </script>
-                    </div> -->
-                </div>
-            </div>
-            <br><br>
-            <div class="text-center mt-4">
-                <a class="btn btn-small btn-outline-light " href="/plan">
-                    <i class="fas fa-caret-square-left mr-2"></i> Back
-                </a>
-            </div>
+        <div class="col-md-7">
+          <select class="custom-select" id="warrior" name="warrior">
+            {% for warrior in warriorList %}
+            <option value="{{warrior.IDWarrior}}">{{warrior.Alias}}</option>
+            {% endfor %}
+          </select>
         </div>
-    </section>
-    <!-- Game section end -->
+      </div>
+    </form>
+
+      <div class="row justify-content-center my-3">
+        <div class="col-md">
+          <button type="submit" class="btn btn-outline w-100">
+            Allocate Plan
+          </button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md">
+          <form action="/exportar" method="post">
+            <input
+              type="text"
+              id="IDPlan"
+              readonly="true"
+              hidden="true"
+              value="{{idplan}}"
+              name="IDPlan"
+            />
+            <button
+              type="submit"
+              class="btn btn-outline w-100"
+              id="sendMessageButton"
+            >
+              Export Plan
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md my-3">
+          <button
+            type="button"
+            class="btn btn-outline-danger w-100"
+            onclick="deletePlan()"
+          >
+            Remove Plan
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-1"></div>
+  </div>
 
 
-    <!-- Footer section -->
-    <section class="banner-section ">
-        <div class="footer-section ">
-            <div class="social-links-warp ">
-                <div class="container">
-                    <div class="social-links">
-                        <a href="https://twitter.com/ElevenPaths" target="_blank"><i class="fab fa-twitter"></i><span>twitter</span></a>
-                    </div>
-                </div>
+<!--====== Javascripts & Jquery ======-->
+<script>
+  function deletePlan() {
+    var message;
+    var opcion = confirm(
+      "Este proceso elminará de manera permanente el plan y todo lo relacionado con él"
+    );
+    if (opcion == true) {
+      var plan = location.href.substring(location.href.lastIndexOf("/") + 1);
+      planjson = JSON.parse('{ "plan": ' + plan + "}");
+      planjson = JSON.stringify(planjson);
+      // var asJSON = JSON.stringify(localizacion);
+      console.log(planjson);
+      $.ajax({
+        type: "POST",
+        url: "/deletePlan",
+        contentType: "application/json;charset=UTF-8",
+        data: planjson,
+        dataType: "json",
+        success: (window.location.href = "/"),
+      });
+    } else {
+      message = "Has clickado Cancelar";
+      console.log(message);
+    }
+  }
+</script>
 
-                <div class="copyright bg-transparent">
-                    <p>
-                        Created with <i class="fa fa-heart" aria-hidden="true"></i> by: 'Ideas Locas' (CDCO Telefonica)
-                    </p>
-                    <p>
-                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                        Copyright &copy;
-                        <script>
-                            document.write(new Date().getFullYear());
-                        </script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                    </p>
-                </div>
-            </div>
-    </section>
-    <!-- Footer section end -->
-
-    <!--====== Javascripts & Jquery ======-->
-    <script>
-        function deletePlan() {
-            var message;
-            var opcion = confirm("Este proceso elminará de manera permanente el plan y todo lo relacionado con él");
-            if (opcion == true) {
-
-                let plan = location.href.substring(location.href.lastIndexOf('/') + 1);
-                planjson = JSON.parse('{ "plan": ' + plan + '}');
-                planjson = JSON.stringify(planjson);
-                // var asJSON = JSON.stringify(localizacion);
-                console.log(planjson)
-                $.ajax({
-                    type: 'POST',
-                    url: '/deletePlan',
-                    contentType: 'application/json;charset=UTF-8',
-                    data: planjson,
-                    dataType: 'json',
-                    success: window.location.href = '/',
-
-
-                })
-
-            } else {
-                message = "Has clickado Cancelar";
-                console.log(message)
-            }
-        }
-    </script>
-    <!-- popper -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
-    <!-- popper -->
-    <script src="{{ url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/jquery.slicknav.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/circle-progress.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/jquery.magnific-popup.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-
-</body>
-
-</html>
+{% endblock %}

@@ -1,8 +1,11 @@
-import os	
+import os
 
-secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
-PWD = os.path.abspath(os.curdir)	
+basedir = os.path.dirname(__file__)
 
-DEBUG = True
-SQLALCHEMY_DATABASE_URI = 'sqlite:///{}/mydatabase.db'.format(PWD)
-SQLALCHEMY_TRACK_MODIFICATIONS = False
+SQLALCHEMY_DATABASE_URI = 'sqlite:///' +'mydatabase.db'
+SQLALCHEMY_DATABASE_DIR =  'mydatabase.db'
+SQLALCHEMY_DATABASE_VERSION =  1
+CONSOLE_VERSION =  0.1
+CONSOLE_PATH =  "consola"
+SQLALCHEMY_TRACK_MODIFICATIONS= False
+SQLALCHEMY_MIGRATE_REPO =  'db_repository'

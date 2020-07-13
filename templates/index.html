@@ -1,266 +1,228 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="IdeasLocas">
-
-    <title>ATTPwn</title>
-
-    <!-- Google font -->
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i&display=swap" rel="stylesheet">
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/magnific-popup.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/owl.carousel.min.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/animate.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/slicknav.min.css') }}" />
-
-    <!-- Main Stylesheets -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/all.css') }}" />
-
-
-
-    <script type="text/javascript">
-        function Reloadimage(id, imagen) {
-            var image = "static/img/portfolio/" + imagen;
-            document.getElementById(id).setAttribute('src', image)
-        }
-
-        function ReloadimagePop(id, imagen) {
-            id = "Pop" + id;
-            var image = "static/img/portfolio/" + imagen;
-            document.getElementById(id).setAttribute('src', image)
-        }
-    </script>
-
-</head>
-
-
-
-<body id="page-top">
-
-    <!-- Masthead -->
-
-    <header class="header-section">
-
-        <a class="navbar-brand js-scroll-trigger" href="#page-top">ATTPwn</a>
-        <ul class="main-menu">
-            <li class="nav-item mx-0 mx-lg-1">
-                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/#inicio">Home</a>
+{% extends 'base.html' %} {% block title %} Home {% endblock title %} {% block nav %}
+<nav class="navbar navbar-expand-lg navbar-dark menu">
+    <a class="navbar-brand" href="#"><span>ATT</span>Pwn</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="/#inicio">Home <span class="sr-only">(current)</span></a
+        >
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/plan">Plan</a>
             </li>
-            <li class="nav-item mx-0 mx-lg-1">
-                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/plan">Plan</a>
+            <li class="nav-item">
+                <a class="nav-link" href="/results">Results</a>
             </li>
-            <li class="nav-item mx-0 mx-lg-1">
-                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/results">Results</a>
+            <li class="nav-item">
+                <a class="nav-link" href="/warriors">Warriors</a>
             </li>
-            <li class="nav-item mx-0 mx-lg-1">
-                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/warriors">Warriors</a>
+            <li class="nav-item">
+                <a class="nav-link" href="/attck">ATT&CK</a>
             </li>
-            <li class="nav-item mx-0 mx-lg-1">
-                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/attck">ATT&CK</a>
+            <li class="nav-item">
+                <a class="nav-link" href="/ImportData">Upload</a>
             </li>
-            <li class="nav-item mx-0 mx-lg-1">
-                <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/ImportData">Upload</a>
+            <li class="nav-item">
+                <a class="nav-link" href="/about">About</a>
             </li>
         </ul>
-    </header>
+    </div>
+</nav>
 
-    <!-- Masthead -->
-    <!-- Page top section -->
-    <section class="page-top-section ">
-        <div class="container">
-            <h2>ATTPwn</h2>
-            <br>
-            <h3>Adversary Emulation</h3>
-        </div>
-    </section>
-    <!-- Page top section -->
+{% endblock nav %} {% block content %}
 
-    <!-- Page top section end -->
-    <!-- Icon Divider -->
-    <div class="blog-section  ">
-        <!-- Portfolio Grid Items -->
-        <form method="post">
-            <div class="row ">
-                <div class="col-2 m-md-3">
-                    <!--Blue select-->
-                    <select class="custom-select " id="State" name="State">
-                            <option value="Alive">Living Warriors</option>
-                            <option value="Dead">Dead Warriors</option>
-                            <option value="">All</option>
-                        </select>
-                </div>
-                <div class="col m-md-3">
-                    <button type="input" class="btn btn-outline-primary">Filter</button>
-                </div>
-                <!--/Blue select-->
+<!-- Icon Divider -->
+<script type="text/javascript">
+    function Reloadimage(id, imagen) {
+        var image = "static/img/portfolio/" + imagen;
+        document.getElementById(id).setAttribute("src", image);
+    }
+
+    function ReloadimagePop(id, imagen) {
+        id = "Pop" + id;
+        var image = "static/img/portfolio/" + imagen;
+        document.getElementById(id).setAttribute("src", image);
+    }
+
+    setTimeout(function() {
+        $("#alert_div").fadeOut("fast");
+    }, 5500); // <-- time in milliseconds
+</script>
+
+<div class=" ">
+    <!--  Flash messages-->
+    <div class="row flash justify-content-center">
+        <div class="col-md-12 text-center plan-card justify-content-center">
+            {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %} {% if "success" in category %}
+
+            <div class="alert text-success" role="alert" id="alert_div">
+                {{ message }}
             </div>
-        </form>
+            {% elif "danger" in category %}
 
-        <section class="blog-section mt-3 ">
-            <div class="row">
-                {% for warrior in warriorlist %}
-                <div class="col-md-6 col-lg-2">
-                    <div class="item-hover text-center">
-                        <div class="portfolio-item mx-auto" data-toggle="modal" data-target="#A{{warrior.IDWarrior}}">
-                            <div class="portfolio-item-caption d-flex align-items-center justify-content-center h-100 w-100">
-                            </div>
+            <div class="alert text-danger" id="alert_div">
+                {{ message }}
+            </div>
+            {% else %}
+            <div class="alert text-warning" id="alert_div">
+                {{ message }}
+            </div>
+            {% endif %} {% endfor %} {% endif %} {% endwith %}
+        </div>
+    </div>
+    <!-- END Flash messages-->
+
+    <form method="post" class="row justify-content-center my-5">
+        <!--Warrior select-->
+        <div class="col-lg-2 col-md-4 mt-2">
+            <select class="custom-select" id="State" name="State">
+        <option value="Alive">Living Warriors</option>
+        <option value="Dead">Dead Warriors</option>
+        <option value="">All</option>
+      </select>
+        </div>
+        <!-- Filter select-->
+        <div class="col-md-2 text-center mt-2">
+            <button type="input" class="btn btn-outline w-100">Filter</button>
+        </div>
+    </form>
+
+    <section class="mt-3">
+        <div class="row p-sm-2 pt-md-0 px-4 pt-lg-2 justify-content-center">
+            <div class="col-md-8">
+                <div class="row justify-content-center">
+                    {% for warrior in warriorlist %}
+                    <div class="col-4 col-md-3 col-lg-3 my-4 py-auto">
+                        <div class="card neo align-items-center pt-4" data-toggle="modal" data-target="#A{{warrior.IDWarrior}}">
                             {% if "Windows 10" in warrior.Os %}
-                            <img class="img-fluid" id="{{warrior.IDWarrior}}" alt="{{warrior.Alias}}">
-                            <p>{{warrior.Os}}</p>
-                            <p>{{warrior.Alias}}</p>
+                            <img class="os" id="{{warrior.IDWarrior}}" alt="{{warrior.Alias}}" />
                             <script>
-                                Reloadimage("{{warrior.IDWarrior}}", "win10.png")
+                                Reloadimage("{{warrior.IDWarrior}}", "win10.png");
                             </script>
                             {% elif "Windows 7" in warrior.Os %}
-                            <img class="img-fluid" id="{{warrior.IDWarrior}}" alt="{{warrior.Alias}}">
-                            <p> {{warrior.Os}}</p>
-                            <p>{{warrior.Alias}}</p>
+                            <img class="os" id="{{warrior.IDWarrior}}" alt="{{warrior.Alias}}" />
                             <script>
-                                Reloadimage("{{warrior.IDWarrior}}", "win7.png")
+                                Reloadimage("{{warrior.IDWarrior}}", "win7.png");
                             </script>
                             {%elif "Ubuntu" in warrior.Os %}
-                            <img class="img-fluid" id="{{warrior.IDWarrior}}" alt="{{warrior.Alias}}">
-                            <p> {{warrior.Os}}</p>
-                            <p>{{warrior.Alias}}</p>
+                            <img class="os" id="{{warrior.IDWarrior}}" alt="{{warrior.Alias}}" />
                             <script>
-                                Reloadimage("{{warrior.IDWarrior}}", "ubuntu.png")
+                                Reloadimage("{{warrior.IDWarrior}}", "ubuntu.png");
                             </script>
                             {% elif "Windows 8" in warrior.Os %}
-                            <img class="img-fluid" id="{{warrior.IDWarrior}}" alt="{{warrior.Alias}}">
-                            <p> {{warrior.Os}}</p>
-                            <p>{{warrior.Alias}}</p>
+                            <img class="os" id="{{warrior.IDWarrior}}" alt="{{warrior.Alias}}" />
                             <script>
-                                Reloadimage("{{warrior.IDWarrior}}", "win8.png")
+                                Reloadimage("{{warrior.IDWarrior}}", "win8.png");
                             </script>
                             {% else %}
-                            <img class="img-fluid" id="{{warrior.IDWarrior}}" alt="{{warrior.Alias}}">
-                            <p> {{warrior.Os}}</p>
-                            <p>{{warrior.Alias}}</p>
+                            <img class="os" id="{{warrior.IDWarrior}}" alt="{{warrior.Alias}}" />
                             <script>
-                                Reloadimage("{{warrior.IDWarrior}}", "uknown.png")
+                                Reloadimage("{{warrior.IDWarrior}}", "uknown.png");
+                            </script>
+                            {% endif %}
+
+                            <div class="card-body">
+                                <p class="card-text text-light">{{warrior.Os}}</p>
+                                <p class="card-text text-light text-center warrior">
+                                    {{warrior.Alias}}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div class="mt-4 pt-5 align-self-center align-middle">
+    {% for warrior in warriorlist %}
+
+    <!-- Modal -->
+    <div class="modal fade" id="A{{warrior.IDWarrior}}" tabindex="-1" role="dialog" aria-labelledby="portfolioModal1Label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content modal-attpwn">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Warrior</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+                </div>
+                <div class="modal-body w-100">
+                    <div class="container-fluid">
+                        <div class="row justify-content-center">
+                            <div class="text-center">
+                                <img class="modal-result-image" id="Pop{{warrior.IDWarrior}}" alt="{{warrior.Alias}}" />
+                            </div>
+                            {% if "Windows 10" in warrior.Os %}
+                            <script>
+                                ReloadimagePop("{{warrior.IDWarrior}}", "win10.png");
+                            </script>
+                            {% elif "Windows 7" in warrior.Os %}
+                            <script>
+                                ReloadimagePop("{{warrior.IDWarrior}}", "win7.png");
+                            </script>
+                            {%elif "Ubuntu" in warrior.Os %}
+                            <script>
+                                ReloadimagePop("{{warrior.IDWarrior}}", "ubuntu.png");
+                            </script>
+                            {% elif "Windows 8" in warrior.Os %}
+                            <script>
+                                ReloadimagePop("{{warrior.IDWarrior}}", "win8.png");
+                            </script>
+                            {% else %}
+                            <script>
+                                ReloadimagePop("{{warrior.IDWarrior}}", "uknown.png");
                             </script>
                             {% endif %}
                         </div>
+                        <div class="row mt-1 justify-content-center">
+                            <div class="col-md text-center">
+                                <h2 class="warrior-card-title">{{warrior.Alias}}</h2>
+                            </div>
+                        </div>
+                        <div class="row py-1">
+                            <div class="col-md text-center">
+                                <p class="text-attpwn-white">{{warrior.Os}}</p>
+
+                                <table class="table text-center modal-table mt-4">
+                                    <tr class="text-white tr-thead">
+                                        <th>ID</th>
+                                        <th>Architecture</th>
+                                        <th>PID</th>
+                                        <th>Last Seen</th>
+                                        <th>IP</th>
+                                    </tr>
+                                    <tr class="text-dark">
+                                        <td>{{warrior.Alias}}</td>
+                                        <td>{{warrior.Arch}}</td>
+                                        <td>{{warrior.PID}}</td>
+                                        <td>{{warrior.Lastseen}}</td>
+                                        <td>{{warrior.IP}}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                {% endfor %}
-
-            </div>
-
-        </section>
-    </div>
-
-    <!-- /.row -->
-    <!-- Footer section -->
-    <section class="banner-section ">
-        <div class="footer-section ">
-            <div class="social-links-warp ">
-                <div class="container">
-                    <div class="social-links">
-                        <a href="https://twitter.com/ElevenPaths" target="_blank"><i class="fab fa-twitter"></i><span>twitter</span></a>
-                    </div>
-                </div>
-
-                <div class="copyright bg-transparent">
-                    <p>
-                        Created with <i class="fa fa-heart" aria-hidden="true"></i> by: 'Ideas Locas' (CDCO Telefonica)
-                    </p>
-                    <p>
-                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                        Copyright &copy;
-                        <script>
-                            document.write(new Date().getFullYear());
-                        </script> All rights reserved | This template is made with <i class="fa fa-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                    </p>
-                </div>
-            </div>
-    </section>
-    <!-- Footer section end -->
-    {% for warrior in warriorlist %}
-    <!-- Portfolio Modal N -->
-    <div class="portfolio-modal modal fade  col-10 text-center" id="A{{warrior.IDWarrior}}" tabindex="-1" role="dialog" aria-labelledby="portfolioModal1Label" aria-hidden="true">
-        <div class="modal-dialog modal-xl" role="document">
-            <div class="modal-content ">
-                <button class="hand-pointer" type="button" class="close" data-dismiss="modal" aria-label="Close">
-                     <i class="fas fa-times "> </i>
-                 </button>
-
-                <div class="modal-body">
-
-                    <h2 class="portfolio-modal-title text-secondary text-uppercase mb-0 text-center">{{warrior.Alias}} </h2>
-                    <div class="container">
-                        <br>
-                        <div class="row">
-                            <div class="col-md-5 text-right">
-                                <div class="text-center">
-                                    <img class="img-SO" id="Pop{{warrior.IDWarrior}}" alt="{{warrior.Alias}}">
-                                </div>
-                                {% if "Windows 10" in warrior.Os %}
-                                <script>
-                                    ReloadimagePop("{{warrior.IDWarrior}}", "win10.png")
-                                </script>
-                                {% elif "Windows 7" in warrior.Os %}
-                                <script>
-                                    ReloadimagePop("{{warrior.IDWarrior}}", "win7.png")
-                                </script>
-                                {%elif "Ubuntu" in warrior.Os %}
-                                <script>
-                                    ReloadimagePop("{{warrior.IDWarrior}}", "ubuntu.png")
-                                </script>
-                                {% elif "Windows 8" in warrior.Os %}
-                                <script>
-                                    ReloadimagePop("{{warrior.IDWarrior}}", "win8.png")
-                                </script>
-                                {% else %}
-                                <script>
-                                    ReloadimagePop("{{warrior.IDWarrior}}", "uknown.png")
-                                </script>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-6 text-left">
-                                <p class="p-cards">{{warrior.Os}}</p>
-
-                                <p class=" p-cards mb-5">ID warrior: {{warrior.Alias}}<br>Architecture: {{warrior.Arch}}<br>PID: {{warrior.PID}}<br>Last Seen: {{warrior.Lastseen}}<br>IP: {{warrior.IP}}</p>
-
-                                <button class="btn btn-primary hand-pointer" href="#" data-dismiss="modal" role="button">
-                                    <i class="fas fa-times fa-fw"></i>
-                                    Close
-                                  </button>
-
-                            </div>
+                <div class="modal-footer">
+                    <div class="row justify-content-end">
+                        <div class="col-md">
+                            <button type="button" class="btn btn-outline w-100" href="#" data-dismiss="modal" role="button">
+                Close
+              </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
+
     {% endfor %}
+</div>
 
-
-
-    <!--====== Javascripts & Jquery ======-->
-
-    <!-- popper -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
-    <!-- popper -->
-    <script src="{{ url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/jquery.slicknav.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/circle-progress.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/jquery.magnific-popup.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-
-</body>
-
-</html>
+{% endblock %}

@@ -1,3 +1,6 @@
+#Title: invoke-mimikatz
+#Technique: T1003
+#Tactic: TA0006
 
 
 function exist-credential

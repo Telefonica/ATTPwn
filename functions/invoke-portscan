@@ -1,3 +1,8 @@
+#Title: invoke-portscan
+#Technique: T1046
+#Tactic: TA0007
+
+
 function Invoke-Portscan
 {
 <#

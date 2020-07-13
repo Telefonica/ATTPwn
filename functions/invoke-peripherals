@@ -1,0 +1,50 @@
+#Title: invoke-peripherals
+#Technique: T1120
+#Tactic: TA0007
+
+#Peripheral Device Discovery
+function invoke-peripherals{
+   
+   $results = ""
+   $good = $false
+
+   #Get the current windows version
+      $windowsVersion = Get-WMIObject win32_operatingsystem | select name  
+
+      #if the user is using a w10 version..
+      if($windowsVersion.name.Contains('Windows 10')) {
+
+         $peripherals_dictionary = Get-PnpDevice -PresentOnly | select Status, Name, DeviceId
+         
+         #checking if the dictionary isn´t null
+         if($peripherals_dictionary){
+            $good = $true
+            $results = $peripherals_dictionary | out-string
+         }
+          
+      } elseif( $windowsVersion.name.Contains('Windows 7') ) {  #if the user is using a w7 version..
+
+         $peripherals_dictionary = Get-WmiObject Win32_PNPEntity | select Status, Name, DeviceId
+
+         #checking if the dictionary isn´t null
+         if($peripherals_dictionary){
+            $good = $true
+            $results = $peripherals_dictionary | out-string
+         }
+      
+      }   
+
+   return @{results=$results;success=$good}
+}
+
+#poner results = $execute.results |out-string
+
+#Main
+
+#GiveMeData if needed
+
+#pdd
+$execute = invoke-peripherals
+return @{results=$execute.results; success=$execute.success;}
+#PutData if needed
+

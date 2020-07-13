@@ -1,0 +1,46 @@
+.display-3 {
+  font-family: "Roboto";
+}
+
+.anim div {
+  animation-name: anim;
+  animation-duration: 2s;
+}
+
+@keyframes anim {
+  0% {
+    bottom: -100px;
+    opacity: 0;
+  }
+
+  100% {
+    bottom: 0px;
+    opacity: 1;
+  }
+}
+
+.logo {
+  font-weight: 900 !important;
+  color: white;
+}
+
+.logo-2 {
+  font-weight: 800;
+  color: white;
+}
+
+.logo,
+.logo-2 {
+  text-shadow: 2px 2px 20px black;
+}
+
+.logo span {
+  border-bottom: 9px solid #10ddb4;
+}
+
+@media (max-width: 285px) {
+  .logo {
+    font-size: 3em;
+    font-weight: 550;
+  }
+}

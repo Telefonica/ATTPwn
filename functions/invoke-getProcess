@@ -1,0 +1,45 @@
+#Title: invoke-getProcess
+#Technique: T1057
+#Tactic: TA0007
+
+function invoke-getProcess
+    {
+    <#
+    .SYNOPSIS
+    list 50 first processes
+    .DESCRIPTION
+    Attack Commands: Run with command_prompt! Elevation is not Required (e.g. root or admin)
+
+    .LINK
+
+    
+    #>
+    $good = $false
+    $results = $null
+    $results = Get-Process | Select-Object -First 50 | Select-Object Handles, ProcessName | Out-String
+    if( -not $results -eq "")
+        {
+        $good = $True
+        }
+
+    return @{results=$results;success=$good}
+    }
+
+
+#Main program
+$execute = {
+  
+}
+
+#GiveMeData if needed
+
+#get-credentials
+$execute = invoke-getProcess
+
+#PutData if needed
+  # if($execute.success)
+  # {
+    
+  # }
+
+return @{results=$execute.results;success=$execute.success}
