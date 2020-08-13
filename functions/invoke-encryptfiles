@@ -1,58 +1,41 @@
 #Title: invoke-encryptfiles
 #Technique: T1486
 #Tactic: TA0040
+#Title: invoke-encryptfiles
+#Technique: T1486
+#Tactic: TA0040
 
 function invoke-encryptfiles {
      
     $results = ""
     $good = $false
-    $extensions = "*.exe", "*.pdf", "*.txt", "*.docx", "*.png", "*.jpg"
     $targetFolder = "$env:appdata\encryptedFiles"
+    $env1 = $env:ALLUSERSPROFILE 
 
     #Create the directory if it doesn´t exist
     if (!(Test-Path $targetFolder -PathType Any)) {
         mkdir $targetFolder 
     }     
-    foreach ($extension in $extensions) {
-        $env1 = Get-ChildItem -Path $env:ALLUSERSPROFILE -Recurse -Include $extension
-        $env2 = Get-ChildItem -Path $env:APPDATA -Recurse -Include $extension
-        $env3 = Get-ChildItem -Path $env:CommonProgramFiles -Recurse -Include $extension
-        $env4 = Get-ChildItem -Path $env:HOMEDRIVE -Recurse -Include $extension
-        $env5 = Get-ChildItem -Path $env:HOMEPATH -Recurse -Include $extension
-        $env6 = Get-ChildItem -Path $env:ProgramData -Recurse -Include $extension
-        $env7 = Get-ChildItem -Path $env:PUBLIC -Recurse -Include $extension
-        $env8 = Get-ChildItem -Path $env:TEMP -Recurse -Include $extension
-        $env9 = Get-ChildItem -Path $env:USERPROFILE -Recurse -Include $extension
-
-        $enviromentVariables = $env1, $env2, $env3, $env4, $env5, $env6, $env7, $env8, $env9
-
-        foreach ($variableEnv in $enviromentVariables) {
-            
-            $fileList = $variableEnv
-            $iteration = 0
- 
-            foreach ($file in $fileList) { 
-                $filesInDir = (Get-ChildItem $targetFolder).count
-                #only 10 files
-                if ($iteration -le 10 -And $filesInDir -le 60) {
-                    #copy each element to a new folder
-                    Copy-Item -Path $file -destination $targetFolder | Out-String
-                }
-                $iteration++  
-            }
-        }
-    }
-
-    Encrypt -targetFolder $targetFolder 
-
+   
+    Set-Location $env1
+    $random = Get-Random -Maximum 500
+    $fileName = $env1 + '\' + $random +'ATTPwn.txt'
+    $file = New-Item -Path $fileName -ItemType File
+    Copy-Item -Path $file -destination $targetFolder
+    Encrypt -targetFolder $targetFolder  
+    $folderResult =Get-ChildItem $targetFolder
+    Write-host $folderResult in $targetFolder
     $encryptedFiles = (Get-ChildItem $targetFolder).count
 
-    if ($encryptedFiles -ge 3) {
+    if ($encryptedFiles -gt 0) {
         $good = $true
-        $results = "Encrypted files as a demo: $encryptedFiles  in $targetFolder "
-    }         
+        $results = "Encrypted file $folderResult as a demo: $encryptedFiles  in $targetFolder then deleted"
+        Remove-Item  $targetFolder -Recurse
+    } 
+    Write-Host $results        
     return @{results = $results; success = $good }
 }
+
 
 function Encrypt {
     
@@ -67,7 +50,7 @@ function Encrypt {
             
         $filePath = $file.fullname
         Invoke-AESEncryption -Mode Encrypt -Key "p@ssw0rd" -Path $filePath
-        Remove-Item –path $filePath
+        Remove-Item -path $filePath -ErrorAction SilentlyContinue
     }
 }
 
@@ -140,7 +123,7 @@ function Invoke-AESEncryption {
                         break
                     }
                     $cipherBytes = [System.IO.File]::ReadAllBytes($File.FullName)
-                    $outPath = $File.FullName -replace ".aes"
+                    $outPath = $File.FullName -replace ".aes" 
                 }
 
                 $aesManaged.IV = $cipherBytes[0..15]
@@ -173,3 +156,4 @@ function Invoke-AESEncryption {
 $execute = invoke-encryptfiles
 return @{results = $execute.results; success = $execute.success; }
 #PutData if needed
+
