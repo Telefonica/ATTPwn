@@ -72,7 +72,7 @@ function invoke-getUsers
  
       $usuarios = get-childitem C:\Users\ | ForEach-Object  Name
  
-      $results += $usuarios | Out-String
+      $results = $usuarios | Out-String
       for ($counter = 0; $counter -lt $usuarios.Count;$counter++)
         {
         If (-not ($UserList -contains $usuarios[$counter]))
@@ -133,7 +133,7 @@ function invoke-getUsers
 
     $results += $listado  | Out-String
 
-    return @{results=$results;success=$good;data=@{user=$UserList}}
+    return @{results=$UserList|Out-String;success=$good;data=@{user=$UserList}}
     }
 
 

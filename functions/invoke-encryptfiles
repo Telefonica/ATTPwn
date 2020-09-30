@@ -1,9 +1,6 @@
 #Title: invoke-encryptfiles
 #Technique: T1486
 #Tactic: TA0040
-#Title: invoke-encryptfiles
-#Technique: T1486
-#Tactic: TA0040
 
 function invoke-encryptfiles {
      

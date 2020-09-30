@@ -593,8 +593,8 @@ def insert_inteligence():
         models.Inteligence_DB(IDIntel = '316',IDTactic= 'TA0040', IDTech = 'T1531', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '317',IDTactic= 'TA0004', IDTech = 'T1088', Function = 'invoke-wsreset', Terminated = 'true'),
         models.Inteligence_DB(IDIntel = '318',IDTactic= 'TA0005', IDTech = 'T1088', Function = 'invoke-wsreset', Terminated = 'true'),
-        models.Inteligence_DB(IDIntel = '319',IDTactic= 'TA0004', IDTech = 'T1088', Function = 'invoke-enviromentInjection', Terminated = 'true'),
-        models.Inteligence_DB(IDIntel = '320',IDTactic= 'TA0005', IDTech = 'T1088', Function = 'invoke-enviromentInjection', Terminated = 'true'),
+        models.Inteligence_DB(IDIntel = '319',IDTactic= 'TA0004', IDTech = 'T1088', Function = 'invoke-environmentInjection', Terminated = 'true'),
+        models.Inteligence_DB(IDIntel = '320',IDTactic= 'TA0005', IDTech = 'T1088', Function = 'invoke-environmentInjection', Terminated = 'true'),
         models.Inteligence_DB(IDIntel = '321',IDTactic= 'TA0005', IDTech = 'T1211', Function = "invoke-disableDefender", Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '322',IDTactic= 'TA0005', IDTech = 'T1211', Function = "invoke-bypassAmsiHijackingDLL", Terminated = 'False'),
       ]

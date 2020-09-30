@@ -30,6 +30,9 @@ from config import SQLALCHEMY_DATABASE_DIR
 from config import SQLALCHEMY_DATABASE_VERSION
 from config import CONSOLE_VERSION
 from config import CONSOLE_PATH
+from config import CONSOLE_VERSION
+from config import APP_VERSION
+
 
 
 # from models imp
@@ -493,7 +496,7 @@ def index():
 
     form = FlaskForm()
 
-    return render_template("index.html",warriorlist=warriorlist,datalist=datalist)
+    return render_template("index.html",warriorlist=warriorlist,datalist=datalist, Estado=Estado)
 
 @app.route('/plan',methods=['GET', 'POST'])
 def plan():
@@ -516,9 +519,11 @@ def about():
 
     database = db.session.query(models.Version_DB).filter_by(repository_id = "database repository").first()
     databaseVersion = database.version 
-    database = db.session.query(models.Version_DB).filter_by(repository_id = "console").first()
-    consoleVersion = database.version 
-    return render_template("about.html",consoleVersion = consoleVersion,databaseVersion = databaseVersion)
+    consoleVersion = CONSOLE_VERSION
+   
+    
+    appVersion = APP_VERSION
+    return render_template("about.html",consoleVersion = consoleVersion,databaseVersion = databaseVersion, appVersion=appVersion)
 
 
 @app.route('/results',methods=['GET', 'POST'])
@@ -712,16 +717,15 @@ def warriors():
 
 
 @app.route('/attck',methods=['GET', 'POST'])
-def threat():
-
+def tactics():
     datalist = []
-    for threats in db.session.query(models.Threat_DB).all():
+    for tactics in db.session.query(models.Tactic_DB).all():
         DataObj = {}
-        DataObj['ID'] = threats.IDthreat
-        DataObj['Name'] = threats.Name
-        DataObj['Information'] = threats.Description
+        DataObj['ID'] = tactics.IDMitre
+        DataObj['Name'] = tactics.Name
+        DataObj['Information'] = tactics.Description + " - "+ tactics.URL_Mitre 
         datalist.append(DataObj)
-    return render_template("Attck.html",threatslist=datalist)
+    return render_template("Attck.html",tacticslist=datalist)
 
 @app.route('/ImportData',methods=['GET', 'POST'])
 def ImportData():

