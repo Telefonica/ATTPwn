@@ -78,11 +78,30 @@
     <form method="post" class="row justify-content-center my-5">
         <!--Warrior select-->
         <div class="col-lg-2 col-md-4 mt-2">
-            <select class="custom-select" id="State" name="State">
-        <option value="Alive">Living Warriors</option>
-        <option value="Dead">Dead Warriors</option>
-        <option value="">All</option>
-      </select>
+        <select class="custom-select" id="State" name="State">
+            {% if Estado==""  %}
+                <option value="" selected>All </option>
+            {% else %}
+                <option value="">All </option>    
+            {% endif %}
+
+            {% if Estado=="Alive"  %}
+                <option value="Alive" selected>Living Warriors</option>
+            {% else %}
+                <option value="Alive" >Living Warriors</option>   
+            {% endif %}
+
+            {% if Estado=="Dead"  %}
+                <option value="Dead" selected>Dead Warriors</option>
+            {% else %}
+                <option value="Dead" >Dead Warriors</option>  
+            {% endif %}
+
+            
+            
+         
+
+        </select>
         </div>
         <!-- Filter select-->
         <div class="col-md-2 text-center mt-2">
