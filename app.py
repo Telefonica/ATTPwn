@@ -378,24 +378,23 @@ def Implementation():
     return render_template("implementation.html",tacticList = tacticList,techniqueList = techniqueList  )
 
 
-@app.route('/edit_Implementation',methods=['GET', 'POST'])
-def edit_Implementation():
+@app.route('/add_Implementation',methods=['GET', 'POST'])
+def add_Implementation():
 
     
     inteligenceList = []
     techniqueList = []
-    for inteligences in db.session.query(models.Inteligence_DB).filter_by(IDTactic = 'TA0001'):
-        if inteligences.Function != None:
-            for techniques in db.session.query(models.Technique_DB).filter_by(IDMitre = inteligences.IDTech):
-                techniqueObj = {}
-                techniqueObj['IDMitre'] = techniques.IDMitre
-                techniqueObj['Name'] = techniques.Name
-                techniqueObj['Function'] = inteligences.Function
-                techniqueList.append(techniqueObj)
-                inteligenceObj = {}
-                inteligenceObj['IDIntel'] = inteligences.IDIntel
-                inteligenceObj['Function'] = inteligences.Function
-                inteligenceList.append(inteligenceObj)
+    for inteligences in db.session.query(models.Inteligence_DB).filter_by(IDTactic = 'TA0001'):        
+        for techniques in db.session.query(models.Technique_DB).filter_by(IDMitre = inteligences.IDTech):
+            techniqueObj = {}
+            techniqueObj['IDMitre'] = techniques.IDMitre
+            techniqueObj['Name'] = techniques.Name
+            # techniqueObj['Function'] = inteligences.Function
+            techniqueList.append(techniqueObj)
+            inteligenceObj = {}
+            inteligenceObj['IDIntel'] = inteligences.IDIntel
+            # inteligenceObj['Function'] = inteligences.Function
+            inteligenceList.append(inteligenceObj)
     tacticList = []
     for tactic in db.session.query(models.Tactic_DB).all():
         tacticObj = {}
@@ -403,7 +402,7 @@ def edit_Implementation():
         tacticObj['Name'] = tactic.Name
         tacticList.append(tacticObj)
 
-    return render_template("edit_Implementation.html",tacticList = tacticList,techniqueList = techniqueList  )
+    return render_template("add_Implementation.html",tacticList = tacticList,techniqueList = techniqueList  )
 
 
 # elimina un warrior pasado en la url
@@ -683,13 +682,16 @@ def addDataStore(warriorAlias):
     else:
         warrior = db.session.query(models.Warrior_DB).filter_by(Alias  = warriorAlias).first()
         IDWarrior = warrior.IDWarrior
-        return render_template("addImplementation.html",IDWarrior = IDWarrior,Alias = warriorAlias)
+        return render_template("addLoot.html",IDWarrior = IDWarrior,Alias = warriorAlias)
 
 
 @app.route('/warriors',methods=['GET', 'POST'])
 def warriors():
 
     def existeConsola(filename):
+        return os.path.isfile(filename)
+    
+    def existeBypass(filename):
         return os.path.isfile(filename)
 
     def sustituirConsola(filenameTemplate,filename,ip):
@@ -703,16 +705,37 @@ def warriors():
             fd.close()
             return True
         return False
+    
+    def sustituirBypass(filenameTemplate,filename,ip):
+        if existeBypass('consola/byp4ss_template'):
+            f = open(filenameTemplate, "r")
+            byp4ss_template = f.read()
+            f.close()
+            byp4ss = byp4ss_template.replace("$IP",ip)
+            fd = open(filename, "w")
+            fd.write(byp4ss)
+            print(byp4ss)
+            fd.close()
+            return True
+        return False
+    #request.remote_addr
 
     filename = 'consola/consola'
     filenameTemplate = 'consola/consola_template'
+    bypass = 'consola/byp4ss'
+    bypassTemplate = 'consola/byp4ss_template'
 
     print("generar")
     if request.method == 'POST':
+        good = False
         ip = request.form['ip']
         if sustituirConsola(filenameTemplate,filename,ip):
             print("se ha sustituido")
-            return render_template("warriors.html",ip=ip)
+            good = True
+        if good:
+            if sustituirBypass(bypassTemplate,bypass,ip):
+                print("se ha sustituido")
+                return render_template("warriors.html",ip=ip)
     return render_template("warriors.html")
 
 
@@ -1067,6 +1090,57 @@ def Parsing():
 
 
 
+@app.route('/import_function',methods=['POST'])
+def import_function():
+
+    contenido = request.form["functionFile"]
+    IDTech = request.form["intel"]
+    IDTactic = request.form["tactic"]   
+    function_name = request.form["function_name"]
+    terminated = "False"
+    mensaje = ""
+    if ("terminated" in request.form):
+        terminated = "True"
+
+    inteligence = db.session.query(models.Inteligence_DB).filter_by(IDTactic = IDTactic, IDTech = IDTech,Function = None).first()
+    if inteligence == None: 
+        if not os.path.isfile("functions/"+function_name):         
+            fileName = "functions/"+function_name           
+            with open(fileName, 'w') as f:              
+                f.write("%s\n" % contenido)
+            f.close()
+        registro = models.Inteligence_DB(                
+                IDTech=IDTech,
+                IDTactic=IDTactic,
+                Function=function_name,
+                Terminated=terminated
+
+                )
+        db.session.add(registro)
+        db.session.commit()
+        mensaje = ('insert Inteligence successfully...')
+    else:
+        if not os.path.isfile("functions/"+function_name):         
+            fileName = "functions/"+function_name            
+            with open(fileName, 'w') as f:              
+                f.write("%s\n" % contenido)
+            f.close()
+        inteligence.IDTech=IDTech
+        inteligence.IDTactic=IDTactic
+        inteligence.Function=function_name
+        inteligence.Terminated=terminated                        
+        mensaje = ('update Inteligence successfully...')
+        db.session.commit()
+
+    # copiamos el fichero dentro de functions
+    
+    
+    flash(mensaje, 'success')
+    # return render_template("add_Implementation.html")
+    return redirect(url_for("add_Implementation"))
+    # return redirect("/")
+
+
 
 @app.route('/Directive#Tactica/<IDTactic>',methods=['GET', 'POST'])
 def Tecnica(Tactica):
@@ -1132,12 +1206,26 @@ def Directive():
                             tacticList = tacticList,
                             threatList = threatList)
 
-@app.route ('/Directive/tactic/<IDIntel>')
-def inteligence (IDIntel):
+
+@app.route ('/Directive/tactic/<IDIntel>/<function>')
+def inteligence (IDIntel,function):
+    needFuntion = False
+    if function == "True":
+        needFuntion = True
+
     intels = db.session.query(models.Inteligence_DB).filter_by(IDTactic=IDIntel).all()
     intelArray = []
     for intel in intels:
-        if intel.Function != None:
+        if needFuntion:
+            if intel.Function != None :
+                intelObj = {}
+                intelObj['IDIntel'] = intel.IDIntel
+                tech = db.session.query(models.Technique_DB).filter_by(IDMitre = intel.IDTech).first()
+                intelObj['IDMitre'] = tech.IDMitre
+                intelObj['Name'] = tech.Name
+                intelObj['Function'] = intel.Function
+                intelArray.append(intelObj)
+        else:
             intelObj = {}
             intelObj['IDIntel'] = intel.IDIntel
             tech = db.session.query(models.Technique_DB).filter_by(IDMitre = intel.IDTech).first()
@@ -1145,7 +1233,6 @@ def inteligence (IDIntel):
             intelObj['Name'] = tech.Name
             intelObj['Function'] = intel.Function
             intelArray.append(intelObj)
-
     return jsonify({'intels': intelArray})
 
 @app.route('/givemetable',methods=['GET', 'POST'])
@@ -1214,6 +1301,23 @@ def consola():
     filename = 'consola/consola'
     if existeConsola(filename):
         scheduler = leerFichero(filename)
+        return scheduler.encode("utf-8")
+    return ""
+
+
+@app.route('/givemefunctionfile/<fileName>',methods=['GET', 'POST'])
+def givemefunctionfile(fileName):
+    def existfunctionfile(fileName):
+        return os.path.isfile(fileName)
+
+    def readfile(fileName):
+        f = open(fileName, "r")
+        functionfile = f.read()
+        return functionfile
+
+    filename = 'consola/'+fileName
+    if existfunctionfile(filename):
+        scheduler = readfile(filename)
         return scheduler.encode("utf-8")
     return ""
 
