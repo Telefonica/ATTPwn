@@ -1,0 +1,274 @@
+{% extends 'base.html' %} {% block title %} Add Implementation {% endblock title %} {% block nav %}
+
+<nav class="navbar navbar-expand-lg navbar-dark menu">
+    <a class="navbar-brand" href="#"><span>ATT</span>Pwn</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="/#inicio">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/plan">Plan</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/results">Results</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/warriors">Warriors</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/attck">ATT&CK</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/ImportData">Upload</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/about">About</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+{% endblock nav %} {% block content %}
+
+<!--  Flash messages-->
+<div class="row flash justify-content-center">
+    <div class="col-md-12 text-center plan-card justify-content-center">
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %}
+        {% for category, message in messages %} {% if "success" in category %}
+
+        <div class="alert text-success" role="alert" id="alert_div">
+            {{ message }}
+        </div>
+        {% elif "danger" in category %}
+
+        <div class="alert text-danger" id="alert_div">
+            {{ message }}
+        </div>
+        {% else %}
+        <div class="alert text-warning" id="alert_div">
+            {{ message }}
+        </div>
+        {% endif %} {% endfor %} {% endif %} {% endwith %}
+    </div>
+</div>
+<!-- END Flash messages-->
+<div class="row">
+    <div class="col">
+        <h2 class="text-center logo-2">Add Implementation</h2>
+    </div>
+</div>
+
+<section>
+    <div class="container">
+
+        <form class="comment-form" name="form" onSubmit="return fieldValidation()" action="/import_function"
+            method="post">
+
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+
+                    <h5 class="text-white text-left m-2 text-white">Tactics</h5>
+
+                    <select class="custom-select" id="tactic" name="tactic">
+
+                        {% for tactic in tacticList %}
+                            <option value="{{tactic.IDMitre}}">{{tactic.IDMitre}} - {{tactic.Name}}</option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <h5 class="text-white text-left m-2 text-white">Techniques</h5>
+
+                    <select class="custom-select" id="intel" name="intel">
+                        {% for tech in techniqueList %}
+                        <option value="{{tech.IDMitre}}">{{tech.IDMitre}} - {{tech.Name}}</option>
+                        {% endfor %}
+                    </select>
+
+                </div>
+            </div>
+
+            <div class="row justify-content-center mt-4">
+
+                <div class="col-md-6">
+                    <input type="text" class="d-block form-control bg-threat rounded implementation-input" id="function_name" name="function_name" placeholder="Function Name" />
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-control bg-threat rounded ml-1 text-white">
+
+                        <input type="checkbox" name="terminated">
+                        The function will bifurcate the warrior
+
+                    </label>
+
+                </div>
+
+            </div>
+
+           <div class="row justify-content-center mt-5">
+               <div class="col-md-10">
+
+                    <h5 class="text-white" id="filename">File content</h5>
+
+                    <textarea class="text-area-disabled shadow bg-threat rounded text-white w-100 pl-3 pt-2" rows="10" cols="50" placeholder="The implemented function will appear here..." id="functionFile"
+                    name="functionFile" readonly></textarea>
+
+               </div>
+           </div>
+
+           <div class="row justify-content-center">
+            <div class="col-md-10">
+
+                <div class="row justify-content-end">
+                    <div class="col-md-2">
+                        <label class="btn plan-card btn-outline w-100">
+                            <input type="file" class="d-none" id="input-file" onchange="mostrarContenido(this.files)" />
+                            Select file
+                        </label>
+                    </div>
+
+                    <div class="col-md-2">
+                        <button class="btn btn-outline plan-card w-100">Import</button>
+                    </div>  
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    </form>
+</section>
+
+<!--====== Javascripts & Jquery ======-->
+
+<script>
+    var tactic_select = document.getElementById("tactic");
+    var intel_select = document.getElementById("intel");
+    tactic_select.onclick = function () {
+        tactic = tactic_select.value;
+
+        fetch("/Directive/tactic/" + tactic + "/False").then(function (response) {
+            response.json().then(function (data) {
+                var optionHTML = "";
+                for (var intel of data.intels) {
+                    optionHTML +=
+                        '<option value="' +
+                        intel.IDMitre +
+                        '">' +
+                        intel.IDMitre +
+                        " - " +
+                        intel.Name +
+                        "</option>";
+                }
+                intel_select.innerHTML = optionHTML;
+            });
+        });
+    };
+
+    var Drop_Intel = document.getElementById("intel");
+    Drop_Intel.onclick = function () {
+        if (this.value != "") {
+            var filename = this.value;
+            var flaskcodePath = "/flaskcode/resource-data/" + filename + ".txt";
+            console.log(filename);
+            console.log(flaskcodePath);
+            loadEditor({
+                url: flaskcodePath,
+                filePath: filename,
+            });
+        }
+    };
+
+    function loadEditor(resource, forceReload, isNewResource) {
+        var flaskcode = window.flaskcode || {};
+        if (!forceReload &&
+            (flaskcode.editorWidget.resourceName == resource.url ||
+                (flaskcode.editorWidget.editorState ==
+                    flaskcode.editorStates.MODIFIED &&
+                    !confirm(
+                        "Current changes not saved. Are you sure to move on without saving?"
+                    )))
+        ) {
+            flaskcode.editorWidget.editor.focus();
+            return false;
+        }
+        if (isNewResource) {
+            flaskcode.setEditor("", resource, isNewResource);
+        } else {
+            $.ajax({
+                type: "GET",
+                url: resource.url,
+                dataType: "text",
+                cache: false,
+                beforeSend: function (xhr, settings) {
+                    flaskcode.$editorLoader.show();
+                },
+                success: function (data, status, xhr) {
+                    if (status == "success") {
+                        resource.mimetype = xhr.getResponseHeader("X-File-Mimetype");
+                        resource.extension = xhr.getResponseHeader("X-File-Extension");
+                        resource.encoding = xhr.getResponseHeader("X-File-Encoding");
+                        flaskcode.setEditor(data, resource);
+                    } else {
+                        flaskcode.clearEditor(
+                            flaskcode.editorBodyMsg(
+                                '<h1 class="text-center">Error while loading file !</h1>'
+                            )
+                        );
+                    }
+                },
+                error: function (xhr, status, err) {
+                    flaskcode.clearEditor(
+                        flaskcode.editorBodyMsg(
+                            '<h1 class="text-center">Error while loading file !</h1>' +
+                            '<h2 class="text-center text-danger">' +
+                            err +
+                            "</h2>"
+                        )
+                    );
+                },
+                complete: function (xhr, status) {
+                    flaskcode.$editorLoader.hide();
+                },
+            });
+        }
+    }
+
+
+
+    function mostrarContenido(files) {
+        var file = files[0];
+        var etiqueta = document.getElementById("filename");
+        var function_name = document.getElementById("function_name");
+        // console.log(path.parse(files[0].name).name);
+        // console.log(path.parse(files[0].name).ext);        
+
+        etiqueta.textContent = "File content " + files[0].name + ": ";
+
+        if (files[0].name.split('.').slice(0, -1).join('.') == "") {
+            function_name.value = files[0].name;
+        } else {
+            function_name.value = files[0].name.split('.').slice(0, -1).join('.');
+        }
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            // Cuando éste evento se dispara, los datos están ya disponibles.
+            var output = document.getElementById("functionFile");
+
+            output.textContent = e.target.result;
+        };
+        reader.readAsText(file);
+    }
+</script>
+
+{% endblock %}

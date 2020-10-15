@@ -1,24 +1,14 @@
-{% extends 'base.html' %} {% block title %} Att&ck {% endblock title %} {%block
-nav %}
+{% extends 'base.html' %} {% block title %} Att&ck {% endblock title %} {%block nav %}
 <nav class="navbar navbar-expand-lg navbar-dark menu">
   <a class="navbar-brand" href="#"><span>ATT</span>Pwn</a>
-  <button
-    class="navbar-toggler"
-    type="button"
-    data-toggle="collapse"
-    data-target="#navbarSupportedContent"
-    aria-controls="navbarSupportedContent"
-    aria-expanded="false"
-    aria-label="Toggle navigation"
-  >
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav">
       <li class="nav-item">
-        <a class="nav-link" href="/#inicio"
-          >Home <span class="sr-only">(current)</span></a
-        >
+        <a class="nav-link" href="/#inicio">Home <span class="sr-only">(current)</span></a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="/plan">Plan</a>
@@ -46,29 +36,27 @@ nav %}
 <!-- Buttons -->
 <section>
   <div class="row justify-content-center">
-    <div class="col-3 my-2 py-2 text-center">
-      <button
-        class="btn btn-outline"
-        type="button"
-        onclick="goimplementation(this)"
-        id="implementation"
-        data-toggle="tooltip"
-        data-placement="top"
-        title="Go to implementation view"
-      >
-        Implementations
+
+    <div class="col-4 my-2 py-2 text-center">
+
+      <button class="btn btn-outline my-2" type="button" onclick="goimplementation(this)" id="implementation"
+        data-toggle="tooltip" data-placement="top" title="Go to implementation view">
+        View Implementations
       </button>
-      <button
-        class="btn btn-blck btn-outline"
-        onclick="reset(this)"
-        id="reset"
-        data-toggle="tooltip"
-        data-placement="top"
-        title="Restore default database"
-      >
+
+      <button class="btn btn-outline my-2" type="button" onclick="goAddimplementation(this)" id="addimplementation"
+        data-toggle="tooltip" data-placement="top" title="Go to implementation view">
+        Add Implementations
+      </button>
+
+      <button class="btn btn-blck btn-outline my-2" onclick="reset(this)" id="reset" data-toggle="tooltip"
+        data-placement="top" title="Restore default database">
         Hard reset
       </button>
     </div>
+
+
+
   </div>
 </section>
 <!-- END Buttons -->
@@ -78,40 +66,16 @@ nav %}
     <div class="col-md-4 mt-4 text-center justify-content-center">
       <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item">
-          <a
-            class="nav-link"
-            id="Threats"
-            data-toggle="tab"
-            onclick="swappage2(this)"
-            href=""
-            role="tab"
-            aria-selected="true"
-            >Threats</a
-          >
+          <a class="nav-link" id="Threats" data-toggle="tab" onclick="swappage2(this)" href="" role="tab"
+            aria-selected="true">Threats</a>
         </li>
         <li class="nav-item">
-          <a
-            class="nav-link active"
-            id="Tactics"
-            data-toggle="tab"
-            onclick="swappage(this)"
-            href=""
-            role="tab"
-            aria-selected="false"
-            >Tactics</a
-          >
+          <a class="nav-link active" id="Tactics" data-toggle="tab" onclick="swappage(this)" href="" role="tab"
+            aria-selected="false">Tactics</a>
         </li>
         <li class="nav-item">
-          <a
-            class="nav-link"
-            id="Techniques"
-            data-toggle="tab"
-            onclick="swappage(this)"
-            href=""
-            role="tab"
-            aria-selected="false"
-            >Techniques</a
-          >
+          <a class="nav-link" id="Techniques" data-toggle="tab" onclick="swappage(this)" href="" role="tab"
+            aria-selected="false">Techniques</a>
         </li>
       </ul>
     </div>
@@ -124,10 +88,7 @@ nav %}
   <div class="row justify-content-center mt-4">
     <div class="col-8 justify-content-center text-center">
       <div id="tableDiv">
-        <table
-          class="table plan-card text-white text-center table-borderless"
-          id="tableData"
-        >
+        <table class="table plan-card text-white text-center table-borderless" id="tableData">
           <thead>
             <tr class="warrior-card-title">
               <th id="thID">ID</th>
@@ -272,6 +233,9 @@ nav %}
 
   function goimplementation(sender) {
     window.location = "\implementation";
+  }
+  function goAddimplementation(sender) {
+    window.location = "\add_Implementation";
   }
 </script>
 
