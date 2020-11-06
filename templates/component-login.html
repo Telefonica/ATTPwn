@@ -1,0 +1,12 @@
+
+<p class="text-white userTitle">Hi, {{session["username"]}} </p>
+<button class="btn-settings"  data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false" aria-controls="optionLogout optionAddUser optionDeleteUser">
+    <img src="{{ url_for('static', filename='img/settings.png') }}" alt="settings" width="30px"> 
+</button>
+<ul class="log">
+    
+    <li class="nav-item collapse multi-collapse" id="optionLogout">      <a class="nav-link" href="/logout"> LogOut      </a>   </li>
+    <li class="nav-item collapse multi-collapse" id="optionAddUser">     <a class="nav-link" href="/users"> Users    </a>   </li>
+  
+</ul>
+

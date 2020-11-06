@@ -1,0 +1,112 @@
+{% extends 'base.html' %} {% block title %} Login {% endblock title %} {%block nav %}
+<nav class="navbar navbar-expand-lg navbar-dark menu">
+    <a class="navbar-brand" href="#"><span>ATT</span>Pwn</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="/#inicio">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/plan">Plan</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/results">Results</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/warriors">Warriors</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/attck">ATT&CK</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/ImportData">Upload</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="/about">About</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+{% endblock nav %} {% block content %}
+<!--  Flash messages-->
+<div class="row flash justify-content-center">
+    <div class="col-md-12 text-center plan-card justify-content-center">
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %} {% if "success" in category %}
+
+        <div class="alert text-success" role="alert" id="alert_div">
+            {{ message }}
+        </div>
+        {% elif "danger" in category %}
+
+        <div class="alert text-danger" id="alert_div">
+            {{ message }}
+        </div>
+        {% else %}
+        <div class="alert text-warning" id="alert_div">
+            {{ message }}
+        </div>
+        {% endif %} {% endfor %} {% endif %} {% endwith %}
+    </div>
+</div>
+<!-- END Flash messages-->
+
+<div class="row justify-content-center">
+
+    <div class="col-10 col-md-3 pt-3 mt-3 shadow plan-card">
+        <div class="col-10">
+            <h5 class="upload-subtitle text-center logo">Login</h5>
+        </div>
+        <div class=" text-white">
+            <div class="row justify-content-center">
+                <form class=" pl-md-4 justify-content-center py-2 " method="post">
+
+
+                    <div class="row mt-2">
+                        <div class="col-md-3  mb-1 text-left text-light">
+                            User {{ form.csrf_token }}
+                        </div>
+
+                        <div class="col-md-11 text-left">
+                            {{form.username(class="form-control shadow border-0 text-danger ")}}
+                        </div>
+                    </div>
+
+                    <div class="row mt-3 ">
+                        <div class="col-md-3 mb-1 text-left text-light">
+                            Password
+                        </div>
+                        <div class="col-md-11 text-left">
+                            {{form.password(class="form-control shadow border-0 text-danger")}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        {% for field, errors in form.errors.items() %}
+                        <div class="alert text-danger">
+                            {{ form[field].label }}: {{ ', '.join(errors) }}
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="row justify-content-end  text-center pb-3 mt-5">
+                        <div class=" col-md-6 mr-md-3 ">
+                            {{form.submit( class="btn btn-block btn-outline btn-shadow text-white px-4 d-block d-md-none")}}
+                            <!--MD and higher version-->
+                            {{form.submit( class="btn w-100 btn-outline btn-shadow text-white px-4 d-none d-md-block")}}
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+    setTimeout(function() {
+        $("#alert_div").fadeOut("fast");
+    }, 5500); // <-- time in milliseconds
+</script>
+{% endblock %}

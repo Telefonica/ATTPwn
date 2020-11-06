@@ -349,7 +349,7 @@ def insert_inteligence():
         models.Inteligence_DB(IDIntel = '72', IDTactic= 'TA0003', IDTech = 'T1058', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '73', IDTactic= 'TA0004', IDTech = 'T1058', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '74', IDTactic= 'TA0002', IDTech = 'T1059', Function = None, Terminated = 'False'),
-        models.Inteligence_DB(IDIntel = '75', IDTactic= 'TA0003', IDTech = 'T1060', Function = None, Terminated = 'False'),
+        models.Inteligence_DB(IDIntel = '75', IDTactic= 'TA0003', IDTech = 'T1060', Function = 'invoke-registryrun', Terminated = 'True'),
         models.Inteligence_DB(IDIntel = '76', IDTactic= 'TA0002', IDTech = 'T1061', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '77', IDTactic= 'TA0003', IDTech = 'T1062', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '78', IDTactic= 'TA0007', IDTech = 'T1063', Function = 'invoke-AV_Services', Terminated = 'False'),
@@ -416,7 +416,7 @@ def insert_inteligence():
         models.Inteligence_DB(IDIntel = '139',IDTactic= 'TA0003', IDTech = 'T1109', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '140',IDTactic= 'TA0006', IDTech = 'T1110', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '141',IDTactic= 'TA0006', IDTech = 'T1111', Function = None, Terminated = 'False'),
-        models.Inteligence_DB(IDIntel = '142',IDTactic= 'TA0005', IDTech = 'T1112', Function = None, Terminated = 'False'),
+        models.Inteligence_DB(IDIntel = '142',IDTactic= 'TA0005', IDTech = 'T1112', Function = 'invoke-registryrunClean', Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '143',IDTactic= 'TA0009', IDTech = 'T1113', Function = "invoke-screenshot", Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '144',IDTactic= 'TA0009', IDTech = 'T1114', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '145',IDTactic= 'TA0009', IDTech = 'T1115', Function = None, Terminated = 'False'),
@@ -886,7 +886,6 @@ def insert_threat():
     s.bulk_save_objects(objects)
     s.commit()
 
-
 def insert_plan():
     objects = [   
         models.Plan_DB(IDPlan = '1',IDThreat = '140',Name = 'Notpetya', Description = 'Notpetya'),
@@ -927,7 +926,6 @@ def insert_task():
     s.bulk_save_objects(objects)
     s.commit()
 
-
 def insert_version():
     objects = [   
         models.Version_DB(repository_id = 'console',repository_path = CONSOLE_PATH,version = CONSOLE_VERSION)       
@@ -937,8 +935,6 @@ def insert_version():
         s.commit()
     except:
         print("migration console record already exist")   
-
-
 
 def upgrade_database(version):
     # s = db.session()
@@ -950,4 +946,30 @@ def upgrade_database(version):
         # models.Version_DB(repository_id= 'console',repository_path = CONSOLE_PATH,version = CONSOLE_VERSION)       
         # ]
         # s.bulk_save_objects(objects)
-        # s.commit() 
+        # s.commit()
+    if version == 2 :
+        version_2()
+
+
+
+        
+def version_2():
+
+    inteligence = s.query(models.Inteligence_DB).filter_by(IDIntel = '75').first()
+    if inteligence != None:                         
+        inteligence.Function= 'invoke-registryrun'
+        inteligence.Terminated='True'
+        s.commit()
+    inteligence = None
+    inteligence = s.query(models.Inteligence_DB).filter_by(IDIntel = '142').first()
+    if inteligence != None:                         
+        inteligence.Function= 'invoke-registryrunClean'
+        inteligence.Terminated='False'                                    
+        s.commit()
+
+def insert_user():    
+    objects = [
+        models.Users_DB(id = '1', username = 'root',password_hash ='pbkdf2:sha256:150000$5pMOtD6w$3d33b60f62b7d06ecd4544c22786c3909c1ce1c13260c29e96a69b893e90e535', admin=1)
+    ]
+    s.bulk_save_objects(objects)
+    s.commit() 
