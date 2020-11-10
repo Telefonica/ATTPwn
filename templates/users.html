@@ -1,0 +1,389 @@
+{% extends 'base.html' %} {% block title %} Users {% endblock title %} {%block nav %}
+<nav class="navbar navbar-expand-lg navbar-dark menu">
+    <a class="navbar-brand" href="#"><span>ATT</span>Pwn</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="/#inicio">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/plan">Plan</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/results">Results</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/warriors">Warriors</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/attck">ATT&CK</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/ImportData">Upload</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/about">About</a>
+            </li>
+
+            {% include 'component-login.html' %}
+        </ul>
+    </div>
+</nav>
+{% endblock nav %} {% block content %}
+
+<!--  Flash messages-->
+<div class="row flash justify-content-center">
+    <div class="col-md-12 text-center plan-card justify-content-center">
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %} {% if "success" in category %}
+
+        <div class="alert text-success" role="alert" id="alert_div">
+            {{ message }}
+        </div>
+        {% elif "danger" in category %}
+
+        <div class="alert text-danger" id="alert_div">
+            {{ message }}
+        </div>
+        {% else %}
+        <div class="alert text-warning" id="alert_div">
+            {{ message }}
+        </div>
+        {% endif %} {% endfor %} {% endif %} {% endwith %}
+    </div>
+</div>
+<!-- END Flash messages-->
+
+<div class="row justify-content-center">
+    {% if session["admin"] %}
+    <div class="col-md-12">
+        <div class="row justify-content-center">
+            <!-- List and delete USERS-->
+            <div class="col-md-10 col-lg-5 px-5 pt-3 mt-3 mx-3 ml-md-4 shadow plan-card">
+                <div class="col-12">
+                    <h5 class="upload-subtitle text-center logo">Users</h5>
+                </div>
+
+                <div class="row my-auto justify-content-center">
+
+                    <div class=" col-10 col-md-10" id="tableDiv">
+                        <table class="table text-white bg-table text-center " id="tableData">
+                            <thead class=" bg-table text-white ">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Latch</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in datalist %}
+                                <tr>
+                                    <td class="align-middle text-white">
+                                        {% if user.username == session.username %}
+                                        <span style="color:#10ddb4 ;"> {{ user.username}} </span> {% else %} {{ user.username}} {% endif %}
+
+                                        <!-- if sesion print current user-->
+                                    </td>
+                                    <td class="align-middle text-white">
+
+                                        {% if user.admin %} Administrator {% else %} User {% endif %}
+
+                                        <!-- if sesion print current user-->
+                                    </td>
+                                    <td>
+                                        {% if user.latchAccountId != None %}
+
+                                        <button class="btn w-100 btn-outline disabled my-auto" onclick="unPairSelectedUser(this)" id="{{user.latchAccountId}}">Unpair </button> {% else %}
+                                        <p class="btn w-100 btn-outline disabled my-auto">Not Paired </p>
+                                        {% endif %}
+                                    </td>
+                                    <td class="align-middle">
+                                        <button class="btn" onclick="deleteUser(this)" id="{{user.id}}" data-toggle="tooltip" title="Delete user">
+                                            <img src="{{ url_for('static', filename='img/delete.png') }}" width="30px"
+                                                alt="logo">
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <!-- ADD USERS-->
+            <div class="col-md-3 ml-4 px-5 pt-3 mt-3 shadow plan-card">
+                <div class="col-12">
+                    <h5 class="upload-subtitle text-center logo">Add User</h5>
+                </div>
+                <div class=" text-white">
+                    <div class="row justify-content-center">
+                        <form class=" pl-md-4 justify-content-center py-2 " action="/addUser" method="post">
+
+
+                            <div class="row mt-2">
+                                <div class="col-md-3  mb-1 text-left text-light">
+                                    User
+                                </div>
+                                <div class="col-md-11 ">
+                                    <input class="form-control text-dark" type="text" placeholder="Name" id="nombre" name="nombre" required />
+                                </div>
+
+
+                            </div>
+
+                            <div class="row mt-3 ">
+                                <div class="col-md-3 mb-1 text-left text-light">
+                                    Password
+                                </div>
+                                <div class="col-md-11  ">
+                                    <input class="form-control text-dark" placeholder="Password" id="password" type="password" name="password" required />
+                                </div>
+                            </div>
+
+
+
+                            <div class="row mt-3 ">
+                                <div class="col-md-9 mb-1 text-left text-light">
+                                    Repeat your password
+                                </div>
+                                <div class="col-md-11 text-left">
+                                    <input type="password" id="passwordRepeated" class="form-control text-dark" placeholder="Password" required>
+                                </div>
+                                <div class="col-md-11 d-none" id="alertMessage">
+                                    <p class="text-danger">Passwords doesn´t match.</p>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-md-10">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="isAdmin" name="isAdmin">
+                                        <label class="form-check-label" for="isAdmin">Administrator role</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row text-right pb-3 mt-5">
+                                <div class="col-md">
+                                    <button class="btn btn-outline disabled" id="sendButton">Insert</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UPDATE CONF.INI-->
+    <div class="col-md-3 ml-4 px-5 pt-3 mt-3 shadow plan-card">
+        <div class="row justify-content-center">
+            <h5 class="upload-subtitle text-center logo"> Latch config</h5>
+        </div>
+        <div class=" text-white">
+            <div class="row justify-content-center">
+                <form class=" pl-md-4 justify-content-center py-2 " action="/updateLatchConfig" method="post">
+                    <div class="row mt-2">
+                        <div class="col-md  mb-1 text-left text-light">
+                            AppId
+                        </div>
+                        <div class="col-md-11 ">
+                            <input class="form-control text-dark" type="text" placeholder="Latch AppId" id="latchAppId" name="latchAppId" required value="{{appid}}" />
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col-md  mb-1 text-left text-light">
+                            Secret
+                        </div>
+                        <div class="col-md-11 ">
+                            <input class="form-control text-dark" type="text" placeholder="Latch secret" id="latchSecret" name="latchSecret" required value="{{secret}}" />
+                        </div>
+                    </div>
+
+                    <div class="row text-right pb-3 mt-3">
+                        <div class="col-md-11">
+                            <button class="btn w-100 btn-outline ">Update</button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
+
+    <!--LATCH-->
+    <div class="col-md-3 ml-4 px-5 pt-3 mt-3 shadow plan-card">
+
+        <div class="row justify-content-center">
+            <h5 class="upload-subtitle text-center logo"> Latch Pairing</h5>
+        </div>
+
+        <div class=" text-white">
+            <div class="row justify-content-center">
+                {% for user in datalist %}
+                <!-- User with a latch paired account is going to see this-->
+                {% if session["latchAccountId"] == user.latchAccountId and session["latchAccountId"] != None %}
+                <form class=" pl-md-4 justify-content-center py-2 " action="latchUnpair" method="post">
+                    <div class="row mt-2">
+                        <div class="col-md  mb-1 text-left text-light">
+                            Latch Token
+                        </div>
+                        <div class="col-md-12 ">
+                            <input class="form-control text-dark disabled" type="text" placeholder="Latch Token" id="latchToken" name="latchToken" disabled />
+                        </div>
+                    </div>
+
+                    <div class="row text-right pb-3 mt-3">
+                        <div class="col-md-6">
+                            <button class="btn w-100 btn-outline disabled" disabled>Pair </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn w-100 btn-outline ">Unpair </button>
+                        </div>
+                    </div>
+                </form>
+                {% endif %} {% endfor %}
+
+                <!-- User with a latch unpaired account is going to see this-->
+                {% if session["latchAccountId"] == None %}
+                <form class=" pl-md-4 justify-content-center py-2 " action="/latchPairing" method="post">
+                    <div class="row mt-2">
+                        <div class="col-md  mb-1 text-left text-light">
+                            Latch Token
+                        </div>
+
+                        <div class="col-md-11 ">
+                            <input class="form-control text-dark" type="text" placeholder="Latch Token" id="latchToken" name="latchToken" required />
+                        </div>
+                    </div>
+
+                    <div class="row text-right pb-3 mt-3">
+                        <div class="col-md-6">
+                            <button class="btn w-100 btn-outline ">Pair </button>
+                        </div>
+
+                        <div class="col-md-6">
+                            <button class="btn w-100 btn-outline disabled" disabled>Unpair </button>
+                        </div>
+                    </div>
+
+                </form>
+                {% endif %}
+            </div>
+
+
+        </div>
+
+
+    </div>
+</div>
+
+
+
+{% endblock %} {% block scripts %}
+<script>
+    //Instance of the button
+    const sendButton = document.getElementById("sendButton");
+
+    //First, disabling the button
+    sendButton.disabled = true;
+
+
+    //Getting the passwords objects
+    const password = document.getElementById("password");
+    const passwordRepeated = document.getElementById("passwordRepeated");
+    passwordRepeated.disabled = true;
+    const message = document.getElementById("alertMessage");
+
+
+    //On change event listeners to compare the passwords
+    password.addEventListener("input", checkPasswordsWithRegex);
+    passwordRepeated.addEventListener("input", checkPasswordsWithRegex);
+
+    //Comparing the password fields
+    function checkPasswordsWithRegex() {
+        var regEx = new RegExp("^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$");
+        if (password.value.match(regEx)) {
+            passwordRepeated.disabled = false;
+            message.textContent = "";
+
+            const node = document.createElement("p");
+            node.className = "text-danger";
+            const textnode = document.createTextNode("Passwords doesn´t match.");
+            node.appendChild(textnode);
+
+            message.appendChild(node);
+
+            if (passwordRepeated.value === password.value) {
+                sendButton.disabled = false;
+                sendButton.className = "btn btn-outline";
+                message.className = "col-md-11 d-none"
+            } else {
+                sendButton.disabled = true;
+                sendButton.className = "btn btn-outline disabled";
+                message.className = "col-md-11"
+            }
+        } else {
+            passwordRepeated.disabled = true
+            sendButton.disabled = true;
+            sendButton.className = "btn btn-outline disabled";
+            message.className = "col-md-11"
+            message.textContent = "The password must have at least 8 characters and contain at least one numeric digit and a special character "
+        }
+
+    }
+
+
+    function deleteUser(sender) {
+        const datos = JSON.stringify({
+            IDUser: sender.id,
+        });
+        $.ajax({
+            type: "POST",
+            url: "/deleteUser",
+            contentType: "application/json;charset=UTF-8",
+            data: datos,
+            dataType: "json",
+            success: function(response) {
+                console.log(response);
+                location.reload();
+            },
+            error: function() {
+                alter("Error while deleting the user")
+            },
+        });
+    }
+
+    function unPairSelectedUser(sender) {
+        const data = JSON.stringify({
+            appIDUser: sender.id
+        });
+
+        $.ajax({
+            type: "POST",
+            url: "/unPairSelectedUser",
+            contentType: "application/json;charset=UTF-8",
+            data: data,
+            dataType: "json",
+            success: function(response) {
+                location.reload();
+            },
+            error: function() {
+                alter("Error while unpairing the user")
+            }
+        });
+
+    }
+</script>
+
+{% endblock %}

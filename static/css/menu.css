@@ -13,7 +13,7 @@
 }
 
 .nav-item {
-  margin-left: 10%;
+  margin-left: 7%;
   font-family: "Roboto";
   font-weight: 600;
   transition: 2s;
@@ -26,6 +26,55 @@
 
 .active .nav-link {
   border-bottom: 3px solid #10ddb4;
+}
+.btn-settings{
+  background: none;
+  border: none;
+  position: absolute;
+  top: 10px;
+  right: 17px;
+}
+
+.log{
+  position: absolute;
+  top:45px;
+  right: 10px;
+  background-color: #0d1319;
+  list-style: none;
+  text-decoration: none;
+  padding-right: 50px;
+}
+
+.userTitle{
+  position: absolute;
+  top: 15px;
+  right: 70px;
+  background-color: #0d1319;
+  list-style: none;
+  text-decoration: none;
+ 
+}
+
+@media (max-width:991px){
+  .btn-settings{
+    background: none;
+    border: none;
+    position: absolute;
+    top: 10px;
+    right: 72px;
+  }
+  
+  
+  .userTitle{
+    position: absolute;
+    top: 15px;
+    right: 135px;
+    background-color: #0d1319;
+    list-style: none;
+    text-decoration: none;
+  
+  }
+
 }
 
 body {

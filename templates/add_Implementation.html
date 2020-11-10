@@ -2,8 +2,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark menu">
     <a class="navbar-brand" href="#"><span>ATT</span>Pwn</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -29,6 +28,7 @@
             <li class="nav-item">
                 <a class="nav-link" href="/about">About</a>
             </li>
+            {% include 'component-login.html' %}
         </ul>
     </div>
 </nav>
@@ -38,8 +38,7 @@
 <!--  Flash messages-->
 <div class="row flash justify-content-center">
     <div class="col-md-12 text-center plan-card justify-content-center">
-        {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %}
-        {% for category, message in messages %} {% if "success" in category %}
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %} {% if "success" in category %}
 
         <div class="alert text-success" role="alert" id="alert_div">
             {{ message }}
@@ -66,8 +65,7 @@
 <section>
     <div class="container">
 
-        <form class="comment-form" name="form" onSubmit="return fieldValidation()" action="/import_function"
-            method="post">
+        <form class="comment-form" name="form" onSubmit="return fieldValidation()" action="/import_function" method="post">
 
             <div class="row justify-content-center">
                 <div class="col-md-6">
@@ -114,35 +112,34 @@
 
             </div>
 
-           <div class="row justify-content-center mt-5">
-               <div class="col-md-10">
+            <div class="row justify-content-center mt-5">
+                <div class="col-md-10">
 
                     <h5 class="text-white" id="filename">File content</h5>
 
-                    <textarea class="text-area-disabled shadow bg-threat rounded text-white w-100 pl-3 pt-2" rows="10" cols="50" placeholder="The implemented function will appear here..." id="functionFile"
-                    name="functionFile" readonly></textarea>
+                    <textarea class="text-area-disabled shadow bg-threat rounded text-white w-100 pl-3 pt-2" rows="10" cols="50" placeholder="The implemented function will appear here..." id="functionFile" name="functionFile" readonly></textarea>
 
-               </div>
-           </div>
+                </div>
+            </div>
 
-           <div class="row justify-content-center">
-            <div class="col-md-10">
+            <div class="row justify-content-center">
+                <div class="col-md-10">
 
-                <div class="row justify-content-end">
-                    <div class="col-md-2">
-                        <label class="btn plan-card btn-outline w-100">
+                    <div class="row justify-content-end">
+                        <div class="col-md-2">
+                            <label class="btn plan-card btn-outline w-100">
                             <input type="file" class="d-none" id="input-file" onchange="mostrarContenido(this.files)" />
                             Select file
                         </label>
+                        </div>
+
+                        <div class="col-md-2">
+                            <button class="btn btn-outline plan-card w-100">Import</button>
+                        </div>
                     </div>
 
-                    <div class="col-md-2">
-                        <button class="btn btn-outline plan-card w-100">Import</button>
-                    </div>  
                 </div>
-
             </div>
-        </div>
     </div>
 
     </form>
@@ -153,11 +150,11 @@
 <script>
     var tactic_select = document.getElementById("tactic");
     var intel_select = document.getElementById("intel");
-    tactic_select.onclick = function () {
+    tactic_select.onclick = function() {
         tactic = tactic_select.value;
 
-        fetch("/Directive/tactic/" + tactic + "/False").then(function (response) {
-            response.json().then(function (data) {
+        fetch("/Directive/tactic/" + tactic + "/False").then(function(response) {
+            response.json().then(function(data) {
                 var optionHTML = "";
                 for (var intel of data.intels) {
                     optionHTML +=
@@ -175,7 +172,7 @@
     };
 
     var Drop_Intel = document.getElementById("intel");
-    Drop_Intel.onclick = function () {
+    Drop_Intel.onclick = function() {
         if (this.value != "") {
             var filename = this.value;
             var flaskcodePath = "/flaskcode/resource-data/" + filename + ".txt";
@@ -209,10 +206,10 @@
                 url: resource.url,
                 dataType: "text",
                 cache: false,
-                beforeSend: function (xhr, settings) {
+                beforeSend: function(xhr, settings) {
                     flaskcode.$editorLoader.show();
                 },
-                success: function (data, status, xhr) {
+                success: function(data, status, xhr) {
                     if (status == "success") {
                         resource.mimetype = xhr.getResponseHeader("X-File-Mimetype");
                         resource.extension = xhr.getResponseHeader("X-File-Extension");
@@ -226,7 +223,7 @@
                         );
                     }
                 },
-                error: function (xhr, status, err) {
+                error: function(xhr, status, err) {
                     flaskcode.clearEditor(
                         flaskcode.editorBodyMsg(
                             '<h1 class="text-center">Error while loading file !</h1>' +
@@ -236,7 +233,7 @@
                         )
                     );
                 },
-                complete: function (xhr, status) {
+                complete: function(xhr, status) {
                     flaskcode.$editorLoader.hide();
                 },
             });
@@ -261,7 +258,7 @@
         }
         var reader = new FileReader();
 
-        reader.onload = function (e) {
+        reader.onload = function(e) {
             // Cuando éste evento se dispara, los datos están ya disponibles.
             var output = document.getElementById("functionFile");
 
@@ -269,6 +266,9 @@
         };
         reader.readAsText(file);
     }
+    setTimeout(function() {
+        $("#alert_div").fadeOut("fast");
+    }, 5500); // <-- time in milliseconds
 </script>
 
 {% endblock %}
