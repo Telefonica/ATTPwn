@@ -1,5 +1,7 @@
 from sqlalchemy import Boolean, Column , ForeignKey
 from sqlalchemy import DateTime, Integer, String, Text, Float
+from werkzeug import security as seguridad
+
 import sqlalchemy.orm as orm
 from app import db
 
@@ -119,3 +121,29 @@ class Version_DB(db.Model):
     repository_path     = db.Column(db.Text )
     version             = db.Column(db.Integer)
     
+
+class Users_DB(db.Model):
+    __tablename__ = "usuarios"
+    id                          = db.Column(db.Integer, primary_key= True, nullable=False)
+    username                    = db.Column(db.String(200), nullable=False)
+    password_hash               = db.Column(db.String(128), nullable=False)
+    admin                       = db.Column(db.Boolean, default=False)
+    latchAccountId              = db.Column(db.String(200), nullable=True)
+
+
+
+
+    
+    def __repr__(self):
+	    return (u'<{self.__class__.__name__}: {self.id}>'.format(self=self))	
+    @property
+    def password(self):
+	    raise AttributeError('password is not a readable attribute')	
+    
+    @password.setter
+    def password(self, password):
+	    self.password_hash = seguridad.generate_password_hash(password)
+    def verify_password(self, password):
+	    return seguridad.check_password_hash(self.password_hash, password)
+
+   

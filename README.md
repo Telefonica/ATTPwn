@@ -25,10 +25,15 @@ pip install -r requirements.txt
 
 **Note**: ATTPwn works in **python 3.X**. Make sure you run a pip relative to this version.
 # Usage
+
 ```[python]
 python app.py
 ```
 Now, open your browser: http://localhost:5000
+
+To login: 
+    user: root
+    pass: toor
 
 # Docker
 

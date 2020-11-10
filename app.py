@@ -4,6 +4,7 @@ from flask import Flask, render_template, url_for, request, redirect, jsonify, c
 from flask import Response
 from flask import flash
 from flask_bootstrap import Bootstrap
+from flask_login import LoginManager,login_user,logout_user,login_required,current_user
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Boolean, Column , ForeignKey
 from sqlalchemy import DateTime, Integer, String, Text, Float
@@ -16,6 +17,7 @@ import datetime
 from datetime import timedelta
 import json
 import sqlite3
+from forms import LoginForm
 from flask_wtf import FlaskForm
 from wtforms import SelectField,StringField,validators
 from sqlite3 import Error
@@ -23,6 +25,9 @@ from webargs import flaskparser, fields
 from errors import InternalServerError
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
+import login
+import latch
+import json
 # import db_migrate as migration
 
 from config import SQLALCHEMY_DATABASE_URI
@@ -48,6 +53,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # app.register_blueprint(flaskcode.blueprint, url_prefix='/flaskcode')
 
 db = SQLAlchemy(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
 
 import models
 import db_create as create_db
@@ -57,6 +65,20 @@ import data as ins_records
 
 # manager = Manager(app)
 # manager.add_command('db', MigrateCommand)
+
+
+import configparser
+config = configparser.ConfigParser()
+config.sections()
+config.read('conf.ini')
+config.sections()
+latchAppId = config['Latch']['appId']
+latchSecret = config['Latch']['secret']
+
+
+@login_manager.user_loader
+def load_user(user_id):
+	return db.session.query(models.Users_DB).get(int(user_id))
 
 # validations
 
@@ -325,6 +347,11 @@ def InsertarDatos_BD(objetos):
 # elimina un plan pasado por post
 @app.route('/deletePlan',methods=['GET', 'POST'])
 def deletePlan():
+
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))
+
     respuesta = request.json
     IDPlan = respuesta['plan']
     plan = db.session.query(models.Plan_DB).filter_by(IDPlan = IDPlan).first()
@@ -354,6 +381,11 @@ def deletePlan():
 # elimina un plan pasado por post
 @app.route('/implementation',methods=['GET', 'POST'])
 def Implementation():
+
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))
+
     inteligenceList = []
     techniqueList = []
     for inteligences in db.session.query(models.Inteligence_DB).filter_by(IDTactic = 'TA0001'):
@@ -378,10 +410,298 @@ def Implementation():
     return render_template("implementation.html",tacticList = tacticList,techniqueList = techniqueList  )
 
 
+
+@app.route('/login',methods=['GET', 'POST'])
+def login():
+    from  models import Users_DB
+    from login import login_user
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = Users_DB.query.filter_by(username=form.username.data).first()
+        if user is not None and user.verify_password(form.password.data):
+            
+            #if latch accountID exists 
+            if user.latchAccountId is not None:
+                #if latch status is on, login
+                if(getLatchStatus(user)):
+                    login_user(user)
+                    flash("Latch is unlocked", "success")
+                    return redirect(url_for('index'))
+                else:
+                    flash("Your Latch seems to be locked","danger")
+                    return redirect(url_for('login'))
+            else:
+                login_user(user)
+                return redirect(url_for('index'))
+
+        form.username.errors.append("Wrong password")
+    return render_template('login.html', form=form)
+
+
+
+@app.route('/users',methods=['GET', 'POST'])
+def users():
+
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))
+ 
+    if request.method == 'GET':
+        
+        datalist = []
+        for user in db.session.query(models.Users_DB).all():
+            userObject = {}
+            userObject['id'] = user.id 
+            userObject['username'] = user.username
+            userObject['admin'] = user.admin
+            userObject['latchAccountId'] = user.latchAccountId
+            datalist.append(userObject)
+
+        import configparser
+        config = configparser.ConfigParser()
+        config.sections()
+        config.read('conf.ini')
+        config.sections()
+        appid = config['Latch']['appid']
+        secret = config['Latch']['secret']
+
+        return render_template("users.html", datalist=datalist, appid = appid, secret = secret )
+
+    return render_template("users.html")
+
+@app.route('/addUser',methods=['GET','POST'])
+
+def addUser():   
+
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))
+
+    if request.method == 'POST':               
+        Nombre = request.form['nombre']
+        Password = request.form['password']
+        if request.form.get('isAdmin'):
+            Admin = 1
+        else:
+            Admin = 0
+        registro = models.Users_DB()
+        registro.password = Password
+        registro.username = Nombre
+        registro.admin = Admin
+
+        flash('User added successfully', 'success')
+        db.session.add(registro)    
+        db.session.commit()   
+        
+         
+    return redirect(url_for("users"))
+
+@app.route('/deleteUser', methods=['GET','POST'])
+def deleteUser():
+    
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))
+
+    if request.method == 'POST':
+        data = request.json
+        userID = data["IDUser"]
+
+        registro = db.session.query(models.Users_DB).filter_by(id = userID).first()
+        registro.username = 'borrar'
+        db.session.delete(registro)
+        db.session.commit()
+
+        flash('User deleted successfully', 'success')
+
+        return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
+
+@app.route('/updateLatchConfig', methods=['POST'])
+def updateLatchConfig():
+
+    import configparser
+    import sys
+    
+    appId = request.form['latchAppId']
+    secret = request.form['latchSecret']  
+
+    #update
+    config = configparser.SafeConfigParser()
+    config.read('conf.ini')
+
+    config.set('Latch','appId', appId)
+    config.set('Latch', 'secret', secret)
+
+    with open('conf.ini', 'w') as configfile:
+        config.write(configfile)
+    ##
+    
+  
+    config = configparser.ConfigParser()
+    config.sections()
+    config.read('conf.ini')
+    config.sections()
+    latchAppId = config['Latch']['appId']
+    latchSecret = config['Latch']['secret']
+
+    return redirect(url_for("users"))      
+
+@app.route('/latchUnpair',methods=['POST'])
+def unpairLatch():
+    from flask import session
+    import configparser
+    import sys
+    config = configparser.ConfigParser()
+    config.sections()
+    config.read('conf.ini')
+    config.sections()
+    latchAppId = config['Latch']['appId']
+    latchSecret = config['Latch']['secret']
+    
+    accountID= session["latchAccountId"]
+    #UNPAIR
+    api = latch.Latch(latchAppId, latchSecret)
+    response = api.unpair(accountID)
+
+    if(response != None):
+        #REMOVE ACCID FROM DB
+        userID = session["id"]
+        user = db.session.query(models.Users_DB).filter_by(id = userID).first()
+        user.latchAccountId = None
+        db.session.commit()
+        #REMOVE FROM SESSION
+        session["latchAccountId"]=None
+
+        flash("Unpaired","success")
+    else:
+        flash("Something went wrong","danger")
+        
+    
+
+    return redirect(url_for("users"))
+
+@app.route("/unPairSelectedUser", methods=['POST'])
+def unPairSelectedUser():
+    import configparser
+    import sys
+    config = configparser.ConfigParser()
+    config.sections()
+    config.read('conf.ini')
+    config.sections()
+    latchAppId = config['Latch']['appId']
+    latchSecret = config['Latch']['secret']
+
+    data = request.json
+    appIDUser = data["appIDUser"]
+    from flask import session
+    if(session["latchAccountId"]== appIDUser):
+        session["latchAccountId"]=None
+    #UNPAIR
+    api = latch.Latch(latchAppId, latchSecret)
+    response = api.unpair(appIDUser)
+    if(response != None):
+        registro = db.session.query(models.Users_DB).filter_by(latchAccountId = appIDUser).first()
+        registro.latchAccountId  = None
+        db.session.commit()
+        flash('User: '+ registro.username +' unpaired successfully', 'success')
+        return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
+    else:
+        flash('Something went wrong', 'danger')
+        return json.dumps({'success':False}), 200, {'ContentType':'application/json'}
+        
+@app.route('/latchPairing', methods=['POST'])
+def latchPairing():
+    
+    #retrieve values from form
+    token = request.form['latchToken']
+
+    import configparser
+    import sys
+    config = configparser.ConfigParser()
+    config.sections()
+    config.read('conf.ini')
+    config.sections()
+    latchAppId = config['Latch']['appId']
+    latchSecret = config['Latch']['secret']
+    
+    #create api object with appId and secret
+    api = latch.Latch(latchAppId, latchSecret)
+
+    #Latch pairing 
+    try:
+        response = api.pair(token)
+        responseData = response.get_data()
+        data_string=json.dumps(responseData)
+        decoded=json.loads(data_string)
+        accountId = decoded["accountId"]
+    except:
+        flash("Something went wrong, checkout the fields you have entered", "danger")
+        return redirect(url_for("users")) 
+
+    #Status check
+    response = api.status(accountId)
+    responseData = response.get_data()
+    data_string=json.dumps(responseData)
+    decoded=json.loads(data_string)
+    operations = decoded["operations"]
+    status = operations[latchAppId]["status"]
+    
+    if status == 'on' or status == 'off':
+        #UPDATE ACCOUNTID AT DB
+        from flask import session
+        userID = session["id"]
+        #query db for the user.id
+        user = db.session.query(models.Users_DB).filter_by(id = userID).first()
+        user.latchAccountId = accountId
+        db.session.commit()
+        flash("ATTPwn has been paired with Latch", "success")
+        #UPDATE SESSION 
+        session["latchAccountId"] = accountId
+        return redirect(url_for("users"))  
+    else:
+        flash("Latch appId or secret are wrong", "danger")
+        return redirect(url_for("users"))  
+
+    return redirect(url_for("users"))          
+
+def getLatchStatus(user):
+    import configparser
+    import sys
+    config = configparser.ConfigParser()
+    config.sections()
+    config.read('conf.ini')
+    config.sections()
+    latchAppId = config['Latch']['appId']
+    latchSecret = config['Latch']['secret']
+
+    appid = latchAppId
+    secret = latchSecret
+    api = latch.Latch(appid, secret)
+    #Status check
+    response = api.status(user.latchAccountId)
+    responseData = response.get_data()
+    data_string=json.dumps(responseData)
+    decoded=json.loads(data_string)
+    operations = decoded["operations"]
+    status = operations[appid]["status"]
+    if status == 'on':
+        return True
+    else:
+        return False
+   
+@app.route("/logout")
+def logout():
+    from login import logout_user
+    logout_user()
+    return redirect(url_for('login'))
+
 @app.route('/add_Implementation',methods=['GET', 'POST'])
 def add_Implementation():
 
-    
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))
+
     inteligenceList = []
     techniqueList = []
     for inteligences in db.session.query(models.Inteligence_DB).filter_by(IDTactic = 'TA0001'):        
@@ -422,22 +742,25 @@ def delWarrior(IDWarrior):
     return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
 #vistas principales
 @app.route('/',methods=['GET', 'POST'])
-def index():
-    # if not os.path.exists(SQLALCHEMY_DATABASE_DIR):
+def index():   
+  
     if create_db.create_database() == True:
         flash('database create successfully', 'success')
     database = db.session.query(models.Version_DB).filter_by(repository_id = "database repository").first()
+    version = database.version 
     if database.version < SQLALCHEMY_DATABASE_VERSION:
             message = upgrade_db.upgrade_version()
-            version = database.version 
             try:
                 while version <= SQLALCHEMY_DATABASE_VERSION:
                     ins_records.upgrade_database(version)
                     version += 1            
                 flash(message, 'success')        
             except:            
-                flash("an error ocurred while database updating", 'danger')     
+                flash("an error ocurred while database updating", 'danger')       
     
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))
 
     Estado = "Alive"
     if request.method == "POST":
@@ -446,6 +769,7 @@ def index():
     #Recuperamos los warriors
     warriorlist = []
     datalist = {}
+
 
     #obtenemos la fecha y hora actuales y restamos 3 min para ver si los warrior estan entre esos dos valores
     now  = datetime.datetime.now() - timedelta(minutes= 60 )
@@ -499,6 +823,9 @@ def index():
 
 @app.route('/plan',methods=['GET', 'POST'])
 def plan():
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))
     form = Form()
     planList = []
     for plan in db.session.query(models.Plan_DB).all():
@@ -515,7 +842,9 @@ def plan():
 # elimina un warrior pasado en la url
 @app.route('/about',methods=['GET', 'POST'])
 def about():
-
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))
     database = db.session.query(models.Version_DB).filter_by(repository_id = "database repository").first()
     databaseVersion = database.version 
     consoleVersion = CONSOLE_VERSION
@@ -527,6 +856,9 @@ def about():
 
 @app.route('/results',methods=['GET', 'POST'])
 def results():
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))    
     #Recuperamos los agents y los resultados
     warriorlist = []
     datalist = {}
@@ -586,6 +918,9 @@ def results():
 
 @app.route('/updateDataStore',methods=['POST'])
 def updateDataStore():
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))   
 
     data = request.json
     IDData = data["IDData"]
@@ -621,6 +956,9 @@ def updateDataStore():
 
 @app.route('/dataStore/<warriorAlias>',methods=['GET', 'POST'])
 def dataStore(warriorAlias):
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))   
 
     Filtro = {'Alias': warriorAlias }
     message =  validation_message(models.Warrior_DB,Filtro)
@@ -672,7 +1010,9 @@ def dataStore(warriorAlias):
 
 @app.route('/addDataStore/<warriorAlias>',methods=['GET', 'POST'])
 def addDataStore(warriorAlias):
-
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))       
     Filtro = {'Alias': warriorAlias }
     message =  validation_message(models.Warrior_DB,Filtro)
     if len(message) != 0:
@@ -687,7 +1027,9 @@ def addDataStore(warriorAlias):
 
 @app.route('/warriors',methods=['GET', 'POST'])
 def warriors():
-
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))   
     def existeConsola(filename):
         return os.path.isfile(filename)
     
@@ -741,6 +1083,9 @@ def warriors():
 
 @app.route('/attck',methods=['GET', 'POST'])
 def tactics():
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))       
     datalist = []
     for tactics in db.session.query(models.Tactic_DB).all():
         DataObj = {}
@@ -752,11 +1097,16 @@ def tactics():
 
 @app.route('/ImportData',methods=['GET', 'POST'])
 def ImportData():
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))       
     return render_template("imports.html")
 
 @app.route('/Warrior_Orders/<IDWarrior>',methods=['GET', 'POST'])
 def warrior_orders(IDWarrior):
-
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))   
     try:
         Warrior =  db.session.query(models.Warrior_DB).filter_by(IDWarrior=IDWarrior).first()
         WarriorAlias = Warrior.Alias
@@ -809,6 +1159,9 @@ def warrior_orders(IDWarrior):
 
 @app.route('/set_data',methods=['GET', 'POST'])
 def set_data():
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))   
 
     IDWarrior = request.form['IDWarrior']
     User = request.form['User']
@@ -841,6 +1194,10 @@ def set_data():
 
 @app.route('/putdata',methods=['POST'])
 def putData():
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))   
+
     if 'id' in request.form.keys():
         warriorAlias = request.form['id']
         Filtro = {'Alias': warriorAlias }
@@ -893,6 +1250,10 @@ def putData():
 
 @app.route('/getdata',methods=['POST'])
 def getData():
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))   
+
     dataStoreArray = []
     if 'id' in request.form.keys():
         warriorAlias = request.form['id']
@@ -949,6 +1310,10 @@ def getData():
 
 @app.route('/exportar',methods=['GET', 'POST'])
 def exportar():
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))   
+
     IDPlan = request.form['IDPlan']
     plan = db.session.query(models.Plan_DB).filter_by(IDPlan = IDPlan).first()
     NamePlan = plan.Name
@@ -1034,6 +1399,9 @@ def exportar():
 
 @app.route('/ins_directive',methods=['POST'])
 def Ins_Directive():
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))       
     form = Form()
     IDTasks = request.form.getlist('IDTasks[]')
     IDWarrior = request.form['warrior']
@@ -1049,6 +1417,10 @@ def Ins_Directive():
 
 @app.route('/sel_plan_/<IDPlan>',methods=['GET', 'POST'])
 def selplan(IDPlan):
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))   
+
     form = Form()
     Tasks = db.session.query(models.Task_DB).filter_by(IDPlan=IDPlan).all()
     TaskArray = []
@@ -1080,6 +1452,9 @@ def selplan(IDPlan):
 
 @app.route('/import_plan_json',methods=['POST'])
 def Parsing():
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))       
 
     contenido = request.form["content"]
     objetos = json.loads(contenido)
@@ -1092,6 +1467,9 @@ def Parsing():
 
 @app.route('/import_function',methods=['POST'])
 def import_function():
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))   
 
     contenido = request.form["functionFile"]
     IDTech = request.form["intel"]
@@ -1144,6 +1522,10 @@ def import_function():
 
 @app.route('/Directive#Tactica/<IDTactic>',methods=['GET', 'POST'])
 def Tecnica(Tactica):
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))       
+
     con = sqlite3.connect('mydatabase.db')
     cursorObj = con.cursor()
     cursorObj.execute("SELECT IDTech,URL_Mitre,Name,IDMitre from Technique WHERE IDTactic = ?" ,(IDTactic))
@@ -1168,6 +1550,9 @@ def Tactica():
 
 @app.route('/Directive',methods=['GET', 'POST'])
 def Directive():
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))   
     form = Form()
 
     # inteligenceList = []
@@ -1209,6 +1594,10 @@ def Directive():
 
 @app.route ('/Directive/tactic/<IDIntel>/<function>')
 def inteligence (IDIntel,function):
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))   
+
     needFuntion = False
     if function == "True":
         needFuntion = True
@@ -1237,6 +1626,9 @@ def inteligence (IDIntel,function):
 
 @app.route('/givemetable',methods=['GET', 'POST'])
 def givemetable():
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))   
 
     datalist = []
     if request.method == 'POST':
@@ -1269,6 +1661,9 @@ def givemetable():
 @app.route('/givemefile/<fileName>',methods=['GET', 'POST'])
 
 def givemefile(fileName):
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))   
 
     path = "functions/"+fileName
     f = open(path)
@@ -1278,8 +1673,12 @@ def givemefile(fileName):
     res = make_response(jsonify({"file": data}), 200)
 
     return res
+
 @app.route('/log/<idwarrior>/<nombrefuncion>',methods=['GET'])
 def log(idwarrior,nombrefuncion):
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))       
     #Recuperamos resultados de este warrior y de la funcion
     con = sqlite3.connect('mydatabase.db')
     cursorObj = con.cursor()
@@ -1620,6 +2019,10 @@ def createtables():
     return "OK"
 @app.route('/reset',methods=['GET','POST'])
 def reset():
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))   
+
     for records in db.session.query(models.DataStore_DB).all():
         db.session.delete(records)
     for records in db.session.query(models.Directive_DB).all():

