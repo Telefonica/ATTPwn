@@ -31,7 +31,6 @@ python app.py
 ```
 Now, open your browser: http://localhost:5000
 
-To login: 
     user: root
     pass: toor
 
