@@ -31,8 +31,8 @@ python app.py
 ```
 Now, open your browser: http://localhost:5000
 
-    User: root
-    Pass: toor
+    user: root
+    pass: toor
 
 # Docker
 
