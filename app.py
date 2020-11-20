@@ -728,6 +728,9 @@ def add_Implementation():
 # elimina un warrior pasado en la url
 @app.route('/delWarrior/<IDWarrior>',methods=['GET', 'POST'])
 def delWarrior(IDWarrior):
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login")) 
 
     for Directive in db.session.query(models.Directive_DB).filter_by(IDWarrior = IDWarrior).all():
         db.session.delete(Directive)
@@ -1158,11 +1161,11 @@ def warrior_orders(IDWarrior):
 
 
 @app.route('/set_data',methods=['GET', 'POST'])
-def set_data():
+def set_data(): 
     from login import is_login
     if is_login() == False :
-        return redirect(url_for("login"))   
-
+        return redirect(url_for("login"))
+        
     IDWarrior = request.form['IDWarrior']
     User = request.form['User']
     if User == "":
@@ -1194,9 +1197,7 @@ def set_data():
 
 @app.route('/putdata',methods=['POST'])
 def putData():
-    from login import is_login
-    if is_login() == False :
-        return redirect(url_for("login"))   
+  
 
     if 'id' in request.form.keys():
         warriorAlias = request.form['id']
@@ -1249,10 +1250,7 @@ def putData():
     return "200"
 
 @app.route('/getdata',methods=['POST'])
-def getData():
-    from login import is_login
-    if is_login() == False :
-        return redirect(url_for("login"))   
+def getData():  
 
     dataStoreArray = []
     if 'id' in request.form.keys():
@@ -1954,7 +1952,9 @@ def bye():
 
 @app.route('/settaskplan',methods=['POST'])
 def AsentarPlan():
-
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login")) 
     # form = Form_validations(request.form["ThreatName"])
     # if form.validate():
 
