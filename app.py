@@ -1162,7 +1162,10 @@ def warrior_orders(IDWarrior):
 
 @app.route('/set_data',methods=['GET', 'POST'])
 def set_data(): 
-
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))
+        
     IDWarrior = request.form['IDWarrior']
     User = request.form['User']
     if User == "":
