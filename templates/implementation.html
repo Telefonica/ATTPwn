@@ -47,34 +47,43 @@
                 <h5 class="text-white text-left">Tactics</h5>
                 <div class="text-center">
                     <select class="custom-select" id="tactic" name="tactic">
-            {% for tactic in tacticList %}
-            <option value="{{tactic.IDMitre}}"
-              >{{tactic.IDMitre}} - {{tactic.Name}}</option
-            >
-            {% endfor %}
-          </select>
+                        {% for tactic in tacticList %}
+                        <option value="{{tactic.IDMitre}}">
+                            {{tactic.IDMitre}} - {{tactic.Name}}
+                        </option>
+                        {% endfor %}
+                    </select>
                 </div>
             </div>
         </div>
         <div class="row justify-content-center mt-4">
-            <div class="col-md-5">
+            <div class="col-md-7">
                 <h5 class="text-white text-left">Techniques</h5>
 
                 <div class="text-center">
                     <select class="custom-select" id="intel" name="intel">
-            {% for tech in techniqueList %}
-            <option value="{{tech.Function}}"
-              >{{tech.IDMitre}} - {{tech.Name}} - {{tech.Function}}</option
-            >
-            {% endfor %}
-          </select>
+                        {% for tech in techniqueList %}
+                        <option value="{{tech.Function}}">
+                            {{tech.IDMitre}} - {{tech.Name}} - {{tech.Function}}
+                        </option>
+                        {% endfor %}
+                    </select>
                 </div>
             </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-2  py-4">
+                <form action="/monaco" method="post">
+                    <button id="ImplementationMonaco" class=" btn btn-outline mt-2  w-100">View on monaco</button>
+                    <input type="text" class="d-none form-control bg-threat rounded implementation-input" id="function_name_monaco" name="function_name_monaco" placeholder="Function Name" />
+                </form>
+            </div>
+            
             <div class="col-md-2  py-4">
                 <button id="selectImplementation" class="btn btn-outline mt-2  w-100">Select</button>
             </div>
         </div>
-
     </div>
 
     <div class="row justify-content-center mt-5">
@@ -82,15 +91,18 @@
             <textarea class="text-area-disabled shadow bg-threat rounded text-white w-100 pl-3 pt-2" rows="10" cols="50" placeholder="Function..." name="functionFile" id="functionFile" readonly></textarea>
         </div>
     </div>
-    </div>
+  
 </section>
 
 <!--====== Javascripts & Jquery ======-->
 
 <script>
+    monacoBtn = document.getElementById("ImplementationMonaco");
+    monacoBtn.disabled = true;
     var tactic_select = document.getElementById("tactic");
     var intel_select = document.getElementById("intel");
     tactic_select.onclick = function() {
+        
         tactic = tactic_select.value;
 
         fetch("/Directive/tactic/" + tactic + "/True").then(function(response) {
@@ -117,11 +129,14 @@
     var selectImplementation = document.getElementById("selectImplementation");
     selectImplementation.onclick = function() {
 
+
         if (Drop_Intel.value != "") {
             var filename = Drop_Intel.value;
+            document.getElementById("function_name_monaco").value = filename;
             fetch("/givemefile/" + filename).then(function(response) {
                 response.json().then(function(data) {
                     document.getElementById("functionFile").value = data.file;
+                    monacoBtn.disabled = false;
                 });
             });
         } else {

