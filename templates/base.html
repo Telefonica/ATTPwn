@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/imagenes.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}" />
+ 
 </head>
 
 <body id="page-top">
@@ -55,6 +56,11 @@
     <footer class="sticky container-fluid py-5 pb-1">
         <div class="w-100 row">
             <div class="text-white-50 w-100   text-center ">
+                <p class="footer-text" id="references">
+                  {% block ref %}
+                      
+                  {% endblock ref %}  
+                </p>
                 <p class="footer-text">
                     Created with <img src="{{ url_for('static', filename='img/love.png') }}" class="img-fluid footer-img"></img> by: '<span>Ideas
                     Locas</span>' (CDCO Telefonica)

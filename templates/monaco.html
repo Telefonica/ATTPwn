@@ -1,0 +1,61 @@
+{% extends 'base.html' %} {% block title %} Technique {% endblock title %} {% block nav %}
+<nav class="navbar navbar-expand-lg navbar-dark menu">
+    <a class="navbar-brand" href="#"><span>ATT</span>Pwn</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="/#inicio">Home </a
+            >
+          </li>
+          <li class="nav-item ">
+            <a class="nav-link" href="/plan">Plan</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/results">Results</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/warriors">Warriors</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/attck">ATT&CK</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/ImportData">Upload</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/about">About</a>
+            </li>
+            {% include 'component-login.html' %}
+        </ul>
+    </div>
+</nav>
+
+{% endblock nav %} {% block content %}
+<iframe src='http://{{ruta}}/monaco/{{filename}}' frameborder="0" width="100%" height="0px" id="monacoFrame"></iframe> {% endblock %} {% block ref %} This view was implemented with <a href="https://github.com/sujeetkv/flaskcode" target="blank">Flaskcode </a>{%
+endblock ref %} {% block scripts %}
+<script>
+    //Hides the header
+    header = document.getElementsByClassName("row justify-content-center p-4 logo-wrapper")[0];
+    header.style = "display:none;";
+
+    //Making the frame matching the innerHeight
+    monacoFrame = document.getElementById("monacoFrame");
+    h = window.innerHeight - 200;
+    monacoFrame.style = "height : " + h + "px; margin-top : 80px;";
+
+    //Footer style
+    footer = document.getElementsByClassName("sticky container-fluid py-5 pb-1")[0];
+    footer.style = "margin-top: -300px;"
+
+
+
+    setTimeout(function() {
+        $("#alert_div").fadeOut("fast");
+    }, 5500); // <-- time in milliseconds
+</script>
+
+
+{% endblock scripts %}

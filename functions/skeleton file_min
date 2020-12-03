@@ -1,0 +1,59 @@
+
+
+
+
+
+
+
+function invoke-namefunction
+    {
+     
+    $good = $false
+    $results = $null
+
+    if($PSVersionTable.PSVersion.Major -match "[1-5]")
+    {
+      
+
+    } else {
+      if ($IsWindows)
+      {
+        
+
+      } elseif ($isMacOs) {
+        
+
+      } elseif ($isLinux) {
+        
+
+      }
+    }
+
+    return @{results=$results;success=$good}
+    }
+
+
+
+
+$execute = {
+  
+}
+
+
+
+
+
+
+$execute = invoke-namefunction
+
+
+
+  
+
+  
+
+    
+  
+
+
+return @{results=$execute.results;success=$execute.success}

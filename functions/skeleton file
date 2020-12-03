@@ -16,6 +16,21 @@ function invoke-namefunction
     #>
     $good = $false
     $results = $null
+
+    if($PSVersionTable.PSVersion.Major -match "[1-5]")
+    {
+      # Windows with powershell between v1 and v5.1
+    } else {
+      if ($IsWindows)
+      {
+        # Windows with Powershell v5.1+
+      } elseif ($isMacOs) {
+        # MacOs with Powershell
+      } elseif ($isLinux) {
+        #Linux distribution with Powershell
+      }
+    }
+
     return @{results=$results;success=$good}
     }
 

@@ -1,0 +1,46 @@
+
+
+
+
+
+
+
+function invoke-getProcess
+    {
+     
+    $good = $false
+    $results = $null
+    $results = Get-Process | Select-Object -First 50 | Select-Object Handles, ProcessName | Out-String
+    if( -not $results -eq "")
+        {
+        $good = $True
+        }
+
+    return @{results=$results;success=$good}
+    }
+
+
+
+
+$execute = {
+  
+}
+
+
+
+
+
+
+$execute = invoke-getProcess
+
+
+
+  
+
+  
+
+    
+  
+
+
+return @{results=$execute.results;success=$execute.success}

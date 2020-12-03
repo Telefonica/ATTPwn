@@ -1,0 +1,11 @@
+{# render dir tree in recursive list #} {% macro render_dir_tree(dir_tree, tree_id) %}
+<ul id="{{ tree_id }}">
+    {%- for item in dir_tree.children recursive %}
+    <li class="resource-items{% if item.is_file %} file-item{% elif not item.children %} disabled{% else %} dir-item{% endif %}" title="{{ item.name }}" data-path-name="{{ item.path_name }}" data-url="{{ url_for('resource_data', file_path=item.path_name) }}">
+        {{ item.name }} {%- if item.children -%}
+        <ul>{{ loop(item.children) }}</ul>
+        {%- endif %}
+    </li>
+    {%- endfor %}
+</ul>
+{% endmacro %}

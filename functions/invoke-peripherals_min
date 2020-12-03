@@ -1,0 +1,64 @@
+
+
+
+
+
+
+
+
+
+function invoke-peripherals{
+   
+   $results = ""
+   $good = $false
+
+   
+
+      $windowsVersion = Get-WMIObject win32_operatingsystem | select name  
+
+      
+
+      if($windowsVersion.name.Contains('Windows 10')) {
+
+         $peripherals_dictionary = Get-PnpDevice -PresentOnly | select Status, Name, DeviceId
+         
+         
+
+         if($peripherals_dictionary){
+            $good = $true
+            $results = $peripherals_dictionary | out-string
+         }
+          
+      } elseif( $windowsVersion.name.Contains('Windows 7') ) {  
+
+
+         $peripherals_dictionary = Get-WmiObject Win32_PNPEntity | select Status, Name, DeviceId
+
+         
+
+         if($peripherals_dictionary){
+            $good = $true
+            $results = $peripherals_dictionary | out-string
+         }
+      
+      }   
+
+   return @{results=$results;success=$good}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+$execute = invoke-peripherals
+return @{results=$execute.results; success=$execute.success;}
+
+
+

