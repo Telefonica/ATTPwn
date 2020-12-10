@@ -1,0 +1,347 @@
+/** flaskcode styles **/
+
+body {
+    margin: 0;
+    padding: 0;
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+}
+
+
+/* page preloader start */
+
+#page-preloader {
+    background-color: rgba(30, 30, 35, 1);
+    height: 100%;
+    width: 100%;
+    margin: 0px;
+    padding: 0px;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 999999;
+}
+
+#page-preloader.transparent {
+    background-color: rgba(30, 30, 35, 0.6);
+}
+
+#page-preloader .loading-center {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#page-preloader .loading-center-absolute {
+    position: absolute;
+    text-align: center;
+    font-size: 36px;
+    color: #FFF;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: 100px;
+    margin-top: -50px;
+    text-align: center;
+}
+
+#page-preloader .loading-center-absolute small {
+    font-size: 16px;
+}
+
+
+/* page preloader end */
+
+#wrapper {
+    position: relative;
+    padding-top: 50px;
+    height: 100%;
+    overflow: hidden;
+}
+
+#page-wrapper {
+    position: relative;
+    height: calc(100% - 25px);
+    overflow: hidden;
+}
+
+#page-footer {
+    margin: 0;
+    padding: 0 15px;
+    width: 100%;
+    height: 25px;
+    line-height: 25px;
+    background-color: #1F578E;
+    color: #FFF;
+}
+
+#page-container {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+}
+
+#page-row {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+}
+
+#flaskcode-list {
+    position: relative;
+    height: 100%;
+    overflow: auto;
+}
+
+#flaskcode-list .list-header {
+    border: none;
+    background-color: transparent;
+    white-space: nowrap;
+    height: 38px;
+    font-size: 18px;
+    font-weight: bold;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#flaskcode-content {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    padding: 0;
+    box-shadow: -1px 0 3px #cccccc;
+}
+
+#editor-header {
+    height: 40px;
+    background-color: #dddddd;
+}
+
+#editor-container {
+    position: relative;
+    height: calc(100% - 38px);
+    overflow: hidden;
+}
+
+
+/* editor widget styles start */
+
+div.editor-container {
+    position: relative;
+}
+
+div.editor-container div.editor-body {
+    height: 100%;
+    border: 0;
+    background-color: rgba(30, 30, 35, 1);
+    color: #FFF;
+}
+
+div.editor-container.light-theme div.editor-body {
+    background-color: #FFF;
+    color: rgba(30, 30, 35, 1);
+}
+
+div.editor-container div.editor-body div.editor-body-msg {
+    padding: 20px;
+}
+
+div.editor-container div.editor-notification {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: auto;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 9999;
+}
+
+
+/* editor preloader */
+
+div.editor-container .editor-preloader {
+    background-color: rgba(30, 30, 35, 1);
+    height: 100%;
+    width: 100%;
+    margin: 0px;
+    padding: 0px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 99999;
+}
+
+div.editor-container.light-theme .editor-preloader {
+    background-color: rgba(255, 255, 255, 1);
+}
+
+div.editor-container .editor-preloader.transparent {
+    background-color: rgba(30, 30, 35, 0.6);
+}
+
+div.editor-container.light-theme .editor-preloader.transparent {
+    background-color: rgba(255, 255, 255, 0.6);
+}
+
+div.editor-container .editor-preloader .loading-center {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+div.editor-container .editor-preloader .loading-center-absolute {
+    position: absolute;
+    text-align: center;
+    font-size: 36px;
+    color: #FFF;
+    left: 50%;
+    top: 50%;
+    width: 300px;
+    height: 100px;
+    margin-top: -50px;
+    margin-left: -150px;
+}
+
+div.editor-container.light-theme .editor-preloader .loading-center-absolute {
+    color: rgba(30, 30, 35, 1);
+}
+
+
+/* editor widget styles end */
+
+
+/* global margins start */
+
+.mb-0 {
+    margin-bottom: 0;
+}
+
+.mb-5 {
+    margin-bottom: 5px;
+}
+
+.mb-10 {
+    margin-bottom: 10px;
+}
+
+.mb-15 {
+    margin-bottom: 15px;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
+}
+
+.mb-25 {
+    margin-bottom: 25px;
+}
+
+.mb-30 {
+    margin-bottom: 30px;
+}
+
+.mb-35 {
+    margin-bottom: 35px;
+}
+
+.mb-40 {
+    margin-bottom: 40px;
+}
+
+.mb-45 {
+    margin-bottom: 45px;
+}
+
+.mb-50 {
+    margin-bottom: 50px;
+}
+
+.mt-0 {
+    margin-top: 0;
+}
+
+.mt-5 {
+    margin-top: 5px;
+}
+
+.mt-10 {
+    margin-top: 10px;
+}
+
+.mt-15 {
+    margin-top: 15px;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+.mt-25 {
+    margin-top: 25px;
+}
+
+.mt-30 {
+    margin-top: 30px;
+}
+
+.mt-35 {
+    margin-top: 35px;
+}
+
+.mt-40 {
+    margin-top: 40px;
+}
+
+.mt-45 {
+    margin-top: 45px;
+}
+
+.mt-50 {
+    margin-top: 50px;
+}
+
+
+/* global margins end */
+
+.text-reset {
+    color: #FFF!important;
+}
+
+
+/* custom badge colors */
+
+.badge-default {
+    background-color: #777;
+}
+
+.badge-primary {
+    background-color: #337ab7;
+}
+
+.badge-success {
+    background-color: #5cb85c;
+}
+
+.badge-info {
+    background-color: #5bc0de;
+}
+
+.badge-warning {
+    background-color: #f0ad4e;
+}
+
+.badge-danger {
+    background-color: #d9534f;
+}
+
+
+/* custom alerts */
+
+.alert {
+    border-width: 0;
+    border-radius: 0;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}

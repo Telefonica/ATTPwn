@@ -1,0 +1,65 @@
+
+
+
+
+
+
+
+function invoke-getisvm
+    {
+     
+    $good = $false
+    $results = $null
+
+    if($PSVersionTable.PSVersion.Major -match "[1-5]")
+    {
+        
+
+        $VMvar = get-wmiobject win32_computersystem | Format-List model | Out-String
+        if(($VMvar -like "*VirtualBox*") -or ($VMvar -like "*VMware*") -or ($VMvar -like "*Parallels*") -or ($VMvar -like "*Virtual Machine*"))
+        {
+            $good = $true
+            $results = "Is a VM"
+        } else {
+            $results = "Is NOT a VM"
+        }
+    } else {
+        
+
+        if ($isWindows)
+        {
+            $VMvar = get-wmiobject win32_computersystem | Format-List model | Out-String
+            if(($VMvar -like "*VirtualBox*") -or ($VMvar -like "*VMware*") -or ($VMvar -like "*Parallels*") -or ($VMvar -like "*Virtual Machine*"))
+            {
+                $good = $true
+                $results = "Is a VM"
+            } else {
+                $results = "Is NOT a VM"
+            }
+        }
+        
+
+        elseif ($isMacOs)
+        {
+          $results = "MacOs Detected"
+        }
+        
+
+        elseif ($isLinux)
+        {
+          $results = "Linux Detected"
+        }
+      }
+
+
+    return @{results=$results;success=$good}
+    }
+
+
+
+
+$execute = {}
+
+$execute = invoke-getisvm
+
+return @{results=$execute.results;success=$execute.success}

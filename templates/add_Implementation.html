@@ -64,6 +64,19 @@
 
 <section>
     <div class="container">
+        <!-- <form class="comment-form" name="new_file_monaco" action="/new_file_monaco" method="post">
+            <div class="row justify-content-center">
+
+                <div class="row justify-content-center mt-4">
+                    <div class="col-md-6">
+                        <input type="text" class="d-block form-control bg-threat rounded implementation-input" id="function_name_monaco" name="function_name_monaco" placeholder="Function Name" />
+                    </div>
+                    <button class="btn btn-outline plan-card w-100" type="submit"> Monaco view </button>
+
+                </div>
+            </div>
+        </form> -->
+
 
         <form class="comment-form" name="form" onSubmit="return fieldValidation()" action="/import_function" method="post">
 
@@ -113,6 +126,7 @@
             </div>
 
             <div class="row justify-content-center mt-5">
+
                 <div class="col-md-10">
 
                     <h5 class="text-white" id="filename">File content</h5>
@@ -175,7 +189,7 @@
     Drop_Intel.onclick = function() {
         if (this.value != "") {
             var filename = this.value;
-            var flaskcodePath = "/flaskcode/resource-data/" + filename + ".txt";
+            var flaskcodePath = "/flaskcode/resource-data/" + filename + ".ps1";
             console.log(filename);
             console.log(flaskcodePath);
             loadEditor({
@@ -185,60 +199,83 @@
         }
     };
 
-    function loadEditor(resource, forceReload, isNewResource) {
-        var flaskcode = window.flaskcode || {};
-        if (!forceReload &&
-            (flaskcode.editorWidget.resourceName == resource.url ||
-                (flaskcode.editorWidget.editorState ==
-                    flaskcode.editorStates.MODIFIED &&
-                    !confirm(
-                        "Current changes not saved. Are you sure to move on without saving?"
-                    )))
-        ) {
-            flaskcode.editorWidget.editor.focus();
-            return false;
-        }
-        if (isNewResource) {
-            flaskcode.setEditor("", resource, isNewResource);
-        } else {
-            $.ajax({
-                type: "GET",
-                url: resource.url,
-                dataType: "text",
-                cache: false,
-                beforeSend: function(xhr, settings) {
-                    flaskcode.$editorLoader.show();
-                },
-                success: function(data, status, xhr) {
-                    if (status == "success") {
-                        resource.mimetype = xhr.getResponseHeader("X-File-Mimetype");
-                        resource.extension = xhr.getResponseHeader("X-File-Extension");
-                        resource.encoding = xhr.getResponseHeader("X-File-Encoding");
-                        flaskcode.setEditor(data, resource);
-                    } else {
-                        flaskcode.clearEditor(
-                            flaskcode.editorBodyMsg(
-                                '<h1 class="text-center">Error while loading file !</h1>'
-                            )
-                        );
-                    }
-                },
-                error: function(xhr, status, err) {
-                    flaskcode.clearEditor(
-                        flaskcode.editorBodyMsg(
-                            '<h1 class="text-center">Error while loading file !</h1>' +
-                            '<h2 class="text-center text-danger">' +
-                            err +
-                            "</h2>"
-                        )
-                    );
-                },
-                complete: function(xhr, status) {
-                    flaskcode.$editorLoader.hide();
-                },
-            });
-        }
-    }
+    // function create_newfile(sender) {
+
+    //     var function_name = document.getElementById("function_name");
+    //     var datos = JSON.stringify({
+    //         function_name: function_name.value,
+    //     });
+    //     $.ajax({
+    //         type: "POST",
+    //         url: "/new_file_monaco",
+    //         contentType: "application/json;charset=UTF-8",
+    //         data: datos,
+    //         dataType: "json",
+    //         success: function() {
+    //             console.log("ok");
+    //         },
+    //         error: function() {
+    //             location.reload();
+    //         },
+    //     });
+    // }
+
+
+
+    // function loadEditor(resource, forceReload, isNewResource) {
+    //     var flaskcode = window.flaskcode || {};
+    //     if (!forceReload &&
+    //         (flaskcode.editorWidget.resourceName == resource.url ||
+    //             (flaskcode.editorWidget.editorState ==
+    //                 flaskcode.editorStates.MODIFIED &&
+    //                 !confirm(
+    //                     "Current changes not saved. Are you sure to move on without saving?"
+    //                 )))
+    //     ) {
+    //         flaskcode.editorWidget.editor.focus();
+    //         return false;
+    //     }
+    //     if (isNewResource) {
+    //         flaskcode.setEditor("", resource, isNewResource);
+    //     } else {
+    //         $.ajax({
+    //             type: "GET",
+    //             url: resource.url,
+    //             dataType: "text",
+    //             cache: false,
+    //             beforeSend: function(xhr, settings) {
+    //                 flaskcode.$editorLoader.show();
+    //             },
+    //             success: function(data, status, xhr) {
+    //                 if (status == "success") {
+    //                     resource.mimetype = xhr.getResponseHeader("X-File-Mimetype");
+    //                     resource.extension = xhr.getResponseHeader("X-File-Extension");
+    //                     resource.encoding = xhr.getResponseHeader("X-File-Encoding");
+    //                     flaskcode.setEditor(data, resource);
+    //                 } else {
+    //                     flaskcode.clearEditor(
+    //                         flaskcode.editorBodyMsg(
+    //                             '<h1 class="text-center">Error while loading file !</h1>'
+    //                         )
+    //                     );
+    //                 }
+    //             },
+    //             error: function(xhr, status, err) {
+    //                 flaskcode.clearEditor(
+    //                     flaskcode.editorBodyMsg(
+    //                         '<h1 class="text-center">Error while loading file !</h1>' +
+    //                         '<h2 class="text-center text-danger">' +
+    //                         err +
+    //                         "</h2>"
+    //                     )
+    //                 );
+    //             },
+    //             complete: function(xhr, status) {
+    //                 flaskcode.$editorLoader.hide();
+    //             },
+    //         });
+    //     }
+    // }
 
 
 

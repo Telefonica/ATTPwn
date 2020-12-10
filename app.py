@@ -1,6 +1,7 @@
 from __future__ import with_statement
 from contextlib import closing
-from flask import Flask, render_template, url_for, request, redirect, jsonify, config, make_response
+from flask import Flask, render_template, url_for, request, redirect, jsonify, config, make_response,send_file
+import mimetypes
 from flask import Response
 from flask import flash
 from flask_bootstrap import Bootstrap
@@ -25,10 +26,14 @@ from webargs import flaskparser, fields
 from errors import InternalServerError
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
+from flask import session
+from io import StringIO
+import shutil
+import time
+# import db_migrate as migration
 import login
 import latch
 import json
-# import db_migrate as migration
 
 from config import SQLALCHEMY_DATABASE_URI
 from config import SQLALCHEMY_DATABASE_DIR
@@ -37,7 +42,11 @@ from config import CONSOLE_VERSION
 from config import CONSOLE_PATH
 from config import CONSOLE_VERSION
 from config import APP_VERSION
-
+from config import KNOWLEDGE_VERSION
+from config import DATABASE_DATE_VERSION
+from config import KNOWLEDGE_DATE_VERSION
+from config import CONSOLE_DATE_VERSION
+from config import ATTPWN_DATE_VERSION
 
 
 # from models imp
@@ -47,10 +56,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 Bootstrap(app)
 app.config['SECRET_KEY'] = 'secret'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# app.config.from_object(flaskcode.default_config)
-# app.config['FLASKCODE_RESOURCE_BASEPATH'] = 'functions/'
-# app.register_blueprint(flaskcode.blueprint, url_prefix='/flaskcode')
 
 db = SQLAlchemy(app)
 login_manager = LoginManager()
@@ -343,6 +348,17 @@ def InsertarDatos_BD(objetos):
         IDIntel = insertar_Inteligencia(inteligencias[i])
 
         insertar_Tarea(tareas[i],IDPlan,IDIntel)
+
+
+@app.route('/monacoView/<filename>', methods=['GET'])
+def monacoView(filename):
+
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))
+ 
+    ruta = request.host    
+    return  render_template('monaco.html', filename = filename,ruta = ruta)
 
 # elimina un plan pasado por post
 @app.route('/deletePlan',methods=['GET', 'POST'])
@@ -851,10 +867,14 @@ def about():
     database = db.session.query(models.Version_DB).filter_by(repository_id = "database repository").first()
     databaseVersion = database.version 
     consoleVersion = CONSOLE_VERSION
-   
     
+    knowledgeVersion = KNOWLEDGE_VERSION
+    databasedateVersion = DATABASE_DATE_VERSION
+    knowledgedateVersion = KNOWLEDGE_DATE_VERSION
+    consoledateVersion = CONSOLE_DATE_VERSION
+    attpwndateVersion = ATTPWN_DATE_VERSION
     appVersion = APP_VERSION
-    return render_template("about.html",consoleVersion = consoleVersion,databaseVersion = databaseVersion, appVersion=appVersion)
+    return render_template("about.html",consoleVersion = consoleVersion,databaseVersion = databaseVersion, appVersion=appVersion, knowledgeVersion=knowledgeVersion, knowledgedateVersion=knowledgedateVersion, databasedateVersion=databasedateVersion, consoledateVersion=consoledateVersion, attpwndateVersion=attpwndateVersion)
 
 
 @app.route('/results',methods=['GET', 'POST'])
@@ -1473,48 +1493,93 @@ def import_function():
     IDTech = request.form["intel"]
     IDTactic = request.form["tactic"]   
     function_name = request.form["function_name"]
+    function_name = function_name.replace(" ", "-")
     terminated = "False"
     mensaje = ""
     if ("terminated" in request.form):
         terminated = "True"
+    if (contenido != ""):
+        #se ha seleccionado un fichero
+        inteligence = db.session.query(models.Inteligence_DB).filter_by(IDTactic = IDTactic, IDTech = IDTech,Function = None).first()
+        if inteligence == None: 
+            if not os.path.isfile("functions/"+function_name):         
+                fileName = "functions/"+function_name           
+                with open(fileName, 'w') as f:              
+                    f.write("%s\n" % contenido)
+                f.close()         
+            cleanCommentsfile(fileName)                
+            registro = models.Inteligence_DB(                
+                    IDTech=IDTech,
+                    IDTactic=IDTactic,
+                    Function=function_name,
+                    Terminated=terminated
 
-    inteligence = db.session.query(models.Inteligence_DB).filter_by(IDTactic = IDTactic, IDTech = IDTech,Function = None).first()
-    if inteligence == None: 
-        if not os.path.isfile("functions/"+function_name):         
-            fileName = "functions/"+function_name           
-            with open(fileName, 'w') as f:              
-                f.write("%s\n" % contenido)
-            f.close()
-        registro = models.Inteligence_DB(                
-                IDTech=IDTech,
-                IDTactic=IDTactic,
-                Function=function_name,
-                Terminated=terminated
+                    )
+            db.session.add(registro)
+            db.session.commit()
+            mensaje = ('insert Inteligence successfully...')
+        else:
+            if not os.path.isfile("functions/"+function_name):         
+                fileName = "functions/"+function_name            
+                with open(fileName, 'w') as f:              
+                    f.write("%s\n" % contenido)
+                f.close()                    
+            cleanCommentsfile(fileName) 
+            inteligence.IDTech=IDTech
+            inteligence.IDTactic=IDTactic
+            inteligence.Function=function_name
+            inteligence.Terminated=terminated                        
+            mensaje = ('update Inteligence successfully...')
+            db.session.commit()        
+        
+        flash(mensaje, 'success')
+        return redirect(url_for("add_Implementation"))
+    # return redirect("/")  
+    else:            
+        inteligence = db.session.query(models.Inteligence_DB).filter_by(IDTactic = IDTactic, IDTech = IDTech,Function = None).first()
+        if inteligence == None: 
+            if not os.path.isfile("functions/"+function_name):
+                src = "functions/skeleton file"
+                dst = "functions/"+function_name       
+                shutil.copyfile(src, dst)
+                registro = models.Inteligence_DB(                
+                        IDTech=IDTech,
+                        IDTactic=IDTactic,
+                        Function=function_name,
+                        Terminated=terminated
 
-                )
-        db.session.add(registro)
-        db.session.commit()
-        mensaje = ('insert Inteligence successfully...')
-    else:
-        if not os.path.isfile("functions/"+function_name):         
-            fileName = "functions/"+function_name            
-            with open(fileName, 'w') as f:              
-                f.write("%s\n" % contenido)
-            f.close()
-        inteligence.IDTech=IDTech
-        inteligence.IDTactic=IDTactic
-        inteligence.Function=function_name
-        inteligence.Terminated=terminated                        
-        mensaje = ('update Inteligence successfully...')
-        db.session.commit()
+                        )
+                db.session.add(registro)
+                db.session.commit()
+                mensaje = ('insert Inteligence successfully...')
+                return redirect(url_for("monacoView",filename= function_name ))
+            else:
+                mensaje = 'The file already exists'
+                flash(mensaje, 'error')
+                return redirect(url_for("add_Implementation"))         
+        else:           
+            if not os.path.isfile("functions/"+function_name):
+                src = "functions/skeleton file"
+                dst = "functions/"+function_name       
+                shutil.copyfile(src, dst)
 
-    # copiamos el fichero dentro de functions
-    
-    
-    flash(mensaje, 'success')
-    # return render_template("add_Implementation.html")
-    return redirect(url_for("add_Implementation"))
-    # return redirect("/")
+                inteligence.IDTech=IDTech
+                inteligence.IDTactic=IDTactic
+                inteligence.Function=function_name
+                inteligence.Terminated=terminated                        
+                mensaje = ('update Inteligence successfully...')
+                db.session.commit()               
+                flash(mensaje, 'success')
+
+                return redirect(url_for("monacoView",filename= function_name ))
+            else:
+                mensaje = 'The file already exists'
+                flash(mensaje, 'error')
+                return redirect(url_for("add_Implementation"))       
+
+
+
+      
 
 
 
@@ -1781,10 +1846,17 @@ def givemeplan():
 @app.route('/givemetask',methods=['POST'])
 def givemetask():
 
-    def leerFichero(fichero):
+    def leerFichero(fichero):        
         path = "functions/"+fichero
         logging.debug('Ruta del fichero: '+ path)
-        f = open(path)
+
+        if not os.path.isfile(path+"_min"):         
+            fileName = path                        
+            cleanCommentsfile(fileName) 
+
+        f = open(path+"_min")
+        # f = open(path)
+
         data = f.read()
         f.close()
         return data
@@ -1805,7 +1877,11 @@ def givemepending():
 
     def leerFichero(fichero):
         path = "functions/"+fichero
-        f = open(path)
+        if not os.path.isfile(path+"_min"):         
+            fileName = path                        
+            cleanCommentsfile(fileName) 
+        f = open(path+"_min")
+        # f = open(path)
         data = f.read()
         f.close()
         return data.encode("UTF-8")
@@ -2064,6 +2140,196 @@ def deletetables():
     return "OK"
 
 
+# begins views.py
+@app.route('/resource-data/<path:file_path>.ps1', methods=['GET', 'HEAD'])
+def resource_data(file_path):
+    file_path = os.path.join("functions/", file_path)
+    if not (os.path.exists(file_path) and os.path.isfile(file_path)):
+        abort(404)
+    response = send_file(file_path, mimetype='text/plain', cache_timeout=0)
+    mimetype, encoding = mimetypes.guess_type(file_path, False)
+    if mimetype:
+        response.headers.set('X-File-Mimetype', mimetype)
+        extension = mimetypes.guess_extension(mimetype, False) or get_file_extension(file_path)
+        if extension:
+            response.headers.set('X-File-Extension', extension.lower().lstrip('.'))
+    if encoding:
+        response.headers.set('X-File-Encoding', encoding)
+    return response
+
+@app.route('/update-resource-data/<path:file_path>', methods=['POST'])
+def update_resource_data(file_path):
+    file_path = os.path.join("functions", file_path)
+    is_new_resource = bool(int(request.form.get('is_new_resource', 0)))
+    if not is_new_resource and not (os.path.exists(file_path) and os.path.isfile(file_path)):
+        abort(404)
+    success = True
+    message = 'File saved successfully'
+    resource_data = request.form.get('resource_data', None)
+    if resource_data:
+        success, message = write_file(resource_data, file_path)
+        if (file_path[-4:] != "_min"):
+            cleanCommentsfile(file_path)
+    else:
+        success = False
+        message = 'File data not uploaded'
+    return jsonify({'success': success, 'message': message})
+
+#ends views.py
+
+
+
+#begins utils.py
+
+def get_file_extension(filename):
+    # return filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
+    ext = os.path.splitext(filename)[1]
+    if ext.startswith('.'):
+        ext = ext[1:]
+    return ext.lower()
+
+
+def write_file(content, filepath, chunk_size=None):
+    success = True
+    message = 'File saved successfully'
+    string_types = str
+    DEFAULT_CHUNK_SIZE = 16 * 1024
+    if isinstance(content, string_types):
+        content_io = StringIO()
+        content_io.write(content)
+        with open(filepath, 'w') as dest:
+            content_io.seek(0)
+            try:
+                shutil.copyfileobj(content_io, dest, chunk_size or DEFAULT_CHUNK_SIZE)
+            except OSError as e:
+                success = False
+                message = 'Could not save file: ' + str(e)
+    else:
+        success = False
+        message = 'Could not save file: Invalid content'
+    return success, message
+
+
+def dir_tree(abs_path, abs_root_path, exclude_names=None, excluded_extensions=None, allowed_extensions=None):
+    tree = dict(
+        name=os.path.basename(abs_path),
+        path_name=abs_path[len(abs_root_path):].lstrip('/\\'),# TODO: use os.path.relpath
+        children=[]
+    )
+    try:
+        dir_entries = os.listdir(abs_path)
+    except OSError:
+        pass
+    else:
+        for name in dir_entries:
+            if exclude_names and name in exclude_names:
+                continue
+            new_path = os.path.join(abs_path, name)
+            if os.path.isdir(new_path):
+                tree['children'].append(dir_tree(new_path, abs_root_path, exclude_names, excluded_extensions, allowed_extensions))
+            else:
+                ext = get_file_extension(name)
+                if (excluded_extensions and ext in excluded_extensions) or (allowed_extensions and ext not in allowed_extensions):
+                    continue
+                tree['children'].append(dict(
+                    name=os.path.basename(new_path),
+                    path_name=new_path[len(abs_root_path):].lstrip('/\\'),# TODO: use os.path.relpath
+                    is_file=True,
+                ))
+    return tree
+#end utils.py
+
+def cleanCommentsfile(filename):
+    import sys, token, tokenize
+    """ Run on just one file.
+
+    """
+    source = open(filename)
+    import re 
+
+    all_of_it = source.read()
+
+    # x = re.search("<#(.*?)#>", all_of_it,re.DOTALL)
+    test = re.sub("<#(.*?)#>", " ", all_of_it, count=0, flags = re.DOTALL)
+    mod = open(filename + "_min_", "w")
+
+    mod.write(test)
+    mod.close
+    source.close
+
+    source = open(filename + "_min_")
+    mod = open(filename + "_min", "w")
+    
+    prev_toktype = token.INDENT
+    first_line = None
+    last_lineno = -1
+    last_col = 0
+
+    tokgen = tokenize.generate_tokens(source.readline)
+    for toktype, ttext, (slineno, scol), (elineno, ecol), ltext in tokgen:
+        if 0:   # Change to if 1 to see the tokens fly by.
+            print("%10s %-14s %-20r %r" % (
+                tokenize.tok_name.get(toktype, toktype),
+                "%d.%d-%d.%d" % (slineno, scol, elineno, ecol),
+                ttext, ltext
+                ))
+        if slineno > last_lineno:
+            last_col = 0
+        if scol > last_col:
+            mod.write(" " * (scol - last_col))
+        # if toktype == token.STRING and prev_toktype == token.INDENT:
+        #     # Docstring
+        #     mod.write("<#")
+        if toktype == tokenize.COMMENT:
+            # Comment
+            mod.write("\n")
+        else:
+            mod.write(ttext)
+        prev_toktype = toktype
+        last_col = ecol
+        last_lineno = elineno
+    os.remove(filename + "_min_") 
+
+@app.route('/monaco',methods=['GET', 'POST'])
+def monaco():    
+
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))
+ 
+    filename = ""
+    if request.method == 'POST':     
+        time.sleep(1)        
+        filename = request.form['function_name_monaco']
+
+        dirname = os.path.basename("functions")
+        dtree = dir_tree("functions", "functions" + '/')
+
+        
+    
+    return redirect(url_for("monacoView",filename = filename))
+    # return render_template('_index.html', dirname=dirname, dtree=dtree,filename = filename)
+
+
+@app.route('/monaco/<filename>',methods=['GET', 'POST'])
+# @app.route('/selection',methods=['GET', 'POST'])
+def selection(filename):
+
+    from login import is_login
+    if is_login() == False :
+        return redirect(url_for("login"))
+ 
+    mensaje = ""
+    dirname = os.path.basename("functions")
+    dtree = dir_tree("functions", "functions" + '/')
+    if not os.path.isfile("functions/"+filename): 
+        mensaje = "file "+ filename+ " does not exist"         
+    if (mensaje != ""):
+        flash(mensaje, 'warning')        
+    # return render_template('index.html')
+
+    return render_template('_index.html',dirname=dirname, dtree=dtree,filename = filename )
+    
 
 @app.errorhandler(403)
 def not_found_error(error):

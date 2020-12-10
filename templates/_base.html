@@ -1,0 +1,60 @@
+<!doctype html>
+<html{% block html_attrs %} lang="en" {% endblock %}>
+
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <meta name="robots" content="noindex, nofollow" />
+        <title>{% block page_title %}Functions{% endblock %}</title>
+        <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
+        <meta name="theme-color" content="#222" />
+
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}" /> {% block page_styles %}{% endblock %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/monaco.css') }}" />
+        <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    </head>
+
+    <body{% block body_attrs %}{% endblock %}>
+        {% block page_body %}
+        <div id="page-preloader" class="page-preloader">
+            <div class="loading-center">
+                <div class="loading-center-absolute">
+                    <i class="fa fa-spinner fa-pulse" aria-hidden="true"></i>
+                    <br />
+                    <i class="fa fa-code" aria-hidden="true"></i> Loading ...
+                </div>
+            </div>
+        </div>
+
+        <div id="wrapper">
+            <!-- header -->
+            {% include '_header.html' %}
+            <!-- /header -->
+
+            <div id="page-wrapper">
+                <!-- .container -->
+                <div id="page-container" class="container-fluid">
+                    <!-- page-content -->
+                    {% block page_content %}{% endblock %}
+                    <!-- /page-content -->
+                </div>
+                <!-- /.container -->
+            </div>
+
+            <!-- footer -->
+            {% include '_footer.html' %}
+            <!-- /footer -->
+        </div>
+        {% endblock %}
+
+        <script type="text/javascript" src="{{ url_for('static', filename='vendor/jquery.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.min.js') }}"></script>
+        {% block page_scripts %}{% endblock %}
+        </body>
+
+        </html>

@@ -1,0 +1,65 @@
+
+
+
+
+
+
+
+function invoke-registryrunClean
+    {
+   
+    $good = $false
+    $results = $null
+
+    $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+    $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    if ($currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
+      {
+      if (Test-Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run")
+        {
+        
+            
+        $results = Remove-Item "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run" -Recurse -Force             
+        $good = $true
+        } 
+      }  
+    else 
+      {
+      if (Test-Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run")
+        {
+      
+            
+        Remove-Item "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Recurse -Force
+        Start-Sleep 1       
+        $results = "Clean registry successfully"
+        $good = $true       
+        }        
+      }
+    
+      
+    return @{results = $results | Out-String; success = $good }
+    }
+
+
+    
+$execute = {
+ 
+}
+
+
+
+
+$execute = invoke-registryrunClean
+
+
+  
+
+  
+  
+   
+  
+    
+ 
+return @{results=$execute.results;success=$execute.success}
+
+

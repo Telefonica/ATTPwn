@@ -1,0 +1,67 @@
+
+
+
+
+
+
+
+function invoke-getDirInfo
+  {
+  $winPath = $Env:WinDir
+  $good = $false
+  $results = $null
+
+     
+  function ConvertFrom-WinDictionary ($dictionary)
+    {
+
+    foreach ($item in $dictionary.Name)
+      {
+      $value += ("-"+$item +"`n") | Out-String
+      }
+
+    return $value
+
+    }
+
+  if (!($winPath -eq $null) )
+    { 
+    $good = $true 
+    $Names = Get-ChildItem $Env:WinDir | Select-Object Name
+    $results += "Directory: '"+ $winPath+"'"
+    $results += "`nfilenames: `n"
+    $results += ConvertFrom-WinDictionary($Names)
+    }
+  else 
+    {
+    $results = "An empty win directory"
+    }
+
+return @{results=$results;success=$good}
+}
+
+
+
+
+$execute = {
+  
+}
+
+
+
+
+
+
+$execute = invoke-getDirInfo
+
+
+
+  
+
+  
+
+    
+  
+
+
+return @{results=$execute.results;success=$execute.success}

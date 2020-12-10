@@ -1,0 +1,156 @@
+
+
+
+
+
+
+
+function invoke-servicestop{
+   
+    $results = ""
+    $good = $false
+    $stoppedServices = ""
+
+    $winServices = gwmi win32_service | where State -eq "Running"
+    $services = Get-Service | where Status -eq "Running" 
+    $contw = 0
+    $cont = 0
+
+    foreach($elemento in $winServices){
+    
+        $serviceName=$elemento.name 
+
+        if($serviceName.contains('exchange') -Or $serviceName.contains('mysql') -Or $serviceName.contains('sql'))
+        {
+            
+
+            Stop-Service -Name $serviceName
+            $stoppedServices +=",$serviceName" 
+        
+        }
+        $stoppedServices += read-service-list -serviceName $serviceName
+    }
+
+    foreach($elemento in $winServices){
+
+        $serviceName=$elemento.name 
+
+        if($serviceName.contains('exchange') -Or $serviceName.contains('mysql') -Or $serviceName.contains('sql'))
+        {
+            
+
+            Stop-Service -Name $serviceName
+            $stoppedServices +=",$serviceName" 
+
+        }
+        $stoppedServices += read-service-list -serviceName $serviceName
+   }
+
+    $good = checkServices
+    if($good){
+        $results=$stoppedServices | Out-String
+    }
+
+   return @{results=$results;success=$good}
+}
+
+
+
+
+
+function checkServices{
+    
+    $good=$false
+    $winServices = gwmi win32_service | where State -eq "Running"
+    $services = Get-Service | where Status -eq "Running" 
+
+    $contw = 0
+    $cont = 0
+
+    foreach($elemento in $winServices)
+    {
+
+        $serviceName=$elemento.name 
+
+        if($serviceName.contains('exchange') -Or $serviceName.contains('mysql') -Or $serviceName.contains('sql'))
+            {
+                $contw++
+            }   
+    }
+    
+    foreach($elemento in $winServices){
+        
+        $serviceName=$elemento.name 
+
+        if($serviceName.contains('exchange') -Or $serviceName.contains('mysql') -Or $serviceName.contains('sql'))
+            {
+                $cont++
+            }
+    }
+
+    if($contw -eq 0 -And $cont -eq 0 ){
+        $good = $true
+    }
+
+    return $good
+}
+
+function read-service-list {
+    
+
+    param ( [string] $serviceName )
+    
+    $cnt = 0
+
+    $exchangeServices= "MSExchangeADTopology","MSExchangeAntispamUpdate",
+                        "MSComplianceAudit","MSExchangeCompliance",
+                        "MSExchangeDagMgmt","MSExchangeDiagnostics",
+                        "MSExchangeEdgeSync","MSExchangeFrontEndTransport",
+                        "MSExchangeHM","MSExchangeHMRecovery",
+                        "MSExchangeIMAP4","MSExchangeIMAP4BE",
+                        "MSExchangeIS","MSExchangeMailboxAssistants",
+                        "MSExchangeMailboxReplication","MSExchangeDelivery",
+                        "MSExchangeSubmission","MSExchangeNotificationsBroker",
+                        "MSExchangePOP3","MSExchangePOP3BE",
+                        "MSExchangeRepl","MSExchangeRPC",
+                        "MSExchangeFastSearch","HostControllerService",
+                        "WSBExchange","MSExchangeServiceHost",
+                        "MSExchangeThrottling","MSExchangeTransport",
+                        "MSExchangeTransportLogSearch",
+                        "MSExchangeUM","MSExchangeUMCR",
+                        "ADAM_MSExchange","MSExchangeAntispamUpdate",
+                        "MSExchangeEdgeCredential",
+                        "MSExchangeDiagnostics",
+                        "MSExchangeHM","MSExchangeHMRecovery",
+                        "MSExchangeServiceHost","MSExchangeTransport",
+                        "MSExchangeTransportLogSearch"
+    
+    
+    foreach ($line in $exchangeServices) {
+        if($line -match $regex){
+            $cnt++
+            if($line.Contains($serviceName)){
+                
+
+                Stop-Service -Name $serviceName
+            }
+        }
+        
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+$execute = invoke-servicestop
+return @{results=$execute.results; success=$execute.success;}
+
+
+

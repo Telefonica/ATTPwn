@@ -381,7 +381,7 @@ def insert_inteligence():
         models.Inteligence_DB(IDIntel = '104',IDTactic= 'TA0003', IDTech = 'T1084', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '105',IDTactic= 'TA0005', IDTech = 'T1085', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '106',IDTactic= 'TA0002', IDTech = 'T1085', Function = None, Terminated = 'False'),
-        models.Inteligence_DB(IDIntel = '107',IDTactic= 'TA0002', IDTech = 'T1086', Function = None, Terminated = 'False'),
+        models.Inteligence_DB(IDIntel = '107',IDTactic= 'TA0002', IDTech = 'T1086', Function = 'invoke-powershell_console', Terminated = 'True'),
         models.Inteligence_DB(IDIntel = '108',IDTactic= 'TA0007', IDTech = 'T1087', Function = 'invoke-getUsers', Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '109',IDTactic= 'TA0005', IDTech = 'T1088', Function = 'invoke-eventvwr', Terminated = 'True'),
         models.Inteligence_DB(IDIntel = '110',IDTactic= 'TA0004', IDTech = 'T1088', Function = 'invoke-eventvwr', Terminated = 'True'),
@@ -550,14 +550,14 @@ def insert_inteligence():
         models.Inteligence_DB(IDIntel = '273',IDTactic= 'TA0006', IDTech = 'T1208', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '274',IDTactic= 'TA0003', IDTech = 'T1209', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '275',IDTactic= 'TA0008', IDTech = 'T1210', Function = None, Terminated = 'False'),
-        models.Inteligence_DB(IDIntel = '276',IDTactic= 'TA0005', IDTech = 'T1211', Function = "invoke-bypass_scanbuffer", Terminated = 'False'),
+        models.Inteligence_DB(IDIntel = '276',IDTactic= 'TA0005', IDTech = 'T1211', Function = 'invoke-bypass_scanbuffer', Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '277',IDTactic= 'TA0006', IDTech = 'T1212', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '278',IDTactic= 'TA0009', IDTech = 'T1213', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '279',IDTactic= 'TA0006', IDTech = 'T1214', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '280',IDTactic= 'TA0003', IDTech = 'T1215', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '281',IDTactic= 'TA0005', IDTech = 'T1216', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '282',IDTactic= 'TA0002', IDTech = 'T1216', Function = None, Terminated = 'False'),
-        models.Inteligence_DB(IDIntel = '283',IDTactic= 'TA0007', IDTech = 'T1217', Function = None, Terminated = 'False'),
+        models.Inteligence_DB(IDIntel = '283',IDTactic= 'TA0007', IDTech = 'T1217', Function = 'invoke-getfavsweb', Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '284',IDTactic= 'TA0005', IDTech = 'T1218', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '285',IDTactic= 'TA0002', IDTech = 'T1218', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '286',IDTactic= 'TA0011', IDTech = 'T1219', Function = None, Terminated = 'False'),
@@ -584,7 +584,7 @@ def insert_inteligence():
         models.Inteligence_DB(IDIntel = '307',IDTactic= 'TA0040', IDTech = 'T1495', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '308',IDTactic= 'TA0040', IDTech = 'T1496', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '309',IDTactic= 'TA0005', IDTech = 'T1497', Function = None, Terminated = 'False'),
-        models.Inteligence_DB(IDIntel = '310',IDTactic= 'TA0007', IDTech = 'T1497', Function = None, Terminated = 'False'),
+        models.Inteligence_DB(IDIntel = '310',IDTactic= 'TA0007', IDTech = 'T1497', Function = 'invoke-getisvm', Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '311',IDTactic= 'TA0040', IDTech = 'T1498', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '312',IDTactic= 'TA0040', IDTech = 'T1499', Function = None, Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '313',IDTactic= 'TA0005', IDTech = 'T1500', Function = None, Terminated = 'False'),
@@ -598,6 +598,9 @@ def insert_inteligence():
         models.Inteligence_DB(IDIntel = '321',IDTactic= 'TA0005', IDTech = 'T1211', Function = "invoke-disableDefender", Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '322',IDTactic= 'TA0005', IDTech = 'T1211', Function = "invoke-bypassAmsiHijackingDLL", Terminated = 'False'),
         models.Inteligence_DB(IDIntel = '323',IDTactic= 'TA0005', IDTech = 'T1211', Function = "invoke-disableDefender-bifurcated", Terminated = 'True')
+
+
+
       ]
     s.bulk_save_objects(objects)
     s.commit()

@@ -43,25 +43,32 @@
   </div>
 </nav>
 {% endblock nav %} {% block content %}
-
-<div class="row justify-content-center">
-  <div class="col-md-3">
-    <div class="plan-card text-white">
-      <div class="row justify-content-center">
-        <div class="col-md text-center">
-          Database version: {{databaseVersion}}
-        </div>
-      </div>
-      <div class="row justify-content-center">
-        <div class="col-md text-center">
-          Console version: {{consoleVersion}}
-        </div>
-      </div>
-      <div class="row justify-content-center">
-        <div class="col-md text-center">
-          ATTPwn version: {{appVersion}}
-        </div>
-      </div>
+<div class="row justify-content-center text-white">
+  <div class="col-md-2 plan-card p-3 shadow">
+    <div class="row border-bottom pb-2 mb-2">
+      <div class="col-md-5">Title</div>
+      <div class="col-md-3">Version</div>
+      <div class="col-md-4 text-center">Date</div>
+    </div>
+    <div class="row mb-1">
+      <div class="col-md-5">Database:</div>
+      <div class="col-md-3">{{databaseVersion}}</div>
+      <div class="col-md-4">{{databasedateVersion}}</div>
+    </div>
+    <div class="row mb-1">
+      <div class="col-md-5">Knowledge:</div>
+      <div class="col-md-3">{{knowledgeVersion}}</div>
+      <div class="col-md-4">{{knowledgedateVersion}}</div>
+    </div>
+    <div class="row mb-1">
+      <div class="col-md-5">Console:</div>
+      <div class="col-md-3">{{consoleVersion}}</div>
+      <div class="col-md-4">{{consoledateVersion}}</div>
+    </div>
+    <div class="row mb-1">
+      <div class="col-md-5">ATTPwn:</div>
+      <div class="col-md-3">{{appVersion}}</div>
+      <div class="col-md-4">{{attpwndateVersion}}</div>
     </div>
   </div>
 </div>

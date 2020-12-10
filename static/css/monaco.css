@@ -1,0 +1,105 @@
+html {
+    background: rgba(0, 0, 0, 0.048);
+}
+
+body {
+    background-color: #0d131915!important;
+}
+
+.monaco-editor {
+    background-color: #0d13191e!important;
+}
+
+#editor-header {
+    background-color: #0d1319a1;
+    color: white;
+    border: none;
+}
+
+#flaskcode-list {
+    background: #0d1319;
+    color: white;
+}
+
+li {
+    color: #10ddb47e!important;
+}
+
+div.editor-container .editor-preloader {
+    background-color: #0d1319!important;
+}
+
+.monaco-editor .margin {
+    background-color: #0d1319!important;
+}
+
+.monaco-editor-background {
+    background-color: #0d1319c2!important;
+}
+
+.editor-container .editor-body {
+    background-color: #0d1319c2!important;
+}
+
+#flaskcode-content {
+    box-shadow: -1px 0 3px #10ddb4;
+}
+
+#page-footer {
+    background-color: #0d1319a1;
+}
+
+#flaskcode-list::-webkit-scrollbar {
+    width: 12px;
+    background-color: #0d1319a1;
+}
+
+#flaskcode-list::-webkit-scrollbar-thumb {
+    border-radius: 2px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    background-color: #10ddb43a;
+}
+
+.flash {
+    z-index: 11000;
+    width: 30%;
+    position: fixed;
+    bottom: 5px;
+    right: 5px;
+    background-color: #0d1319;
+    border-radius: 5px;
+}
+
+.text-warning {
+    color: yellow!important;
+    margin-top: 20px!important;
+}
+
+.selected {
+    color: #449c77!important;
+}
+
+#filter_files {
+    cursor: pointer;
+    background-color: #449c77;
+}
+
+#license_button {
+    background-color: #137a66;
+}
+
+#save_button {
+    background-color: #0faa4b;
+}
+
+#reload_button {
+    background-color: #0ccaba;
+}
+
+#force_reload_button {
+    background-color: #0b9489;
+}
+
+#minimap_button {
+    background-color: #086b57;
+}

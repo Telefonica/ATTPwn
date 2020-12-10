@@ -1,0 +1,68 @@
+#Title: invoke-getisvm
+#Technique: T1497
+#Tactic: TA0007
+
+function invoke-getisvm
+    {
+    <#
+    .SYNOPSIS
+    Virtualization/Sandbox Evasion
+    .DESCRIPTION
+    Allows to discover if the machine is physical or is a Virtual Machine.
+
+    .LINK
+    https://attack.mitre.org/techniques/T1497/
+    
+    #>
+    $good = $false
+    $results = $null
+
+    if($PSVersionTable.PSVersion.Major -match "[1-5]")
+    {
+        #$windows_version = [System.Environment]::OSVersion.Version.Major
+        $VMvar = get-wmiobject win32_computersystem | Format-List model | Out-String
+        if(($VMvar -like "*VirtualBox*") -or ($VMvar -like "*VMware*") -or ($VMvar -like "*Parallels*") -or ($VMvar -like "*Virtual Machine*"))
+        {
+            $good = $true
+            $results = "Is a VM"
+        } else {
+            $good = $true
+            $results = "Is NOT a VM"
+        }
+    } else {
+        #If Windows is detected and is using powershell 6+ it will execute this code.
+        if ($isWindows)
+        {
+            $VMvar = get-wmiobject win32_computersystem | Format-List model | Out-String
+            if(($VMvar -like "*VirtualBox*") -or ($VMvar -like "*VMware*") -or ($VMvar -like "*Parallels*") -or ($VMvar -like "*Virtual Machine*"))
+            {
+                $good = $true
+                $results = "Is a VM"
+            } else {
+                $good = $true
+                $results = "Is NOT a VM"
+            }
+        }
+        #If MacOs is detected it will execute this code
+        elseif ($isMacOs)
+        {
+          $results = "MacOs Detected"
+        }
+        #If Linux distribution is detected it will run this code
+        elseif ($isLinux)
+        {
+          $results = "Linux Detected"
+        }
+      }
+
+
+    return @{results=$results;success=$good}
+    }
+
+
+#Main program
+$execute = {}
+
+$execute = invoke-getisvm
+
+return @{results=$execute.results;success=$execute.success}

